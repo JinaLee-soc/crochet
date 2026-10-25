@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>뜨개 기록</title>
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="뜨개 기록">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+/* Research Desk palette (no-ai-design). */
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #e9e8e4;
+  --remaining: #deddd7;
+  --ink: #333330;
+  --muted: #6b6a64;
+  --line: #d7d6d0;
+  --accent: #41413d;
+  --red: #a43e35;
+  --serif: Georgia, 'Times New Roman', serif;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body {
+  font: 14px/1.6 -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+  padding: env(safe-area-inset-top) 0 calc(32px + env(safe-area-inset-bottom));
+  min-height: 100vh;
+}
+h1, h2, p { margin: 0; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; border-radius: 2px; background: transparent; padding: 0; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+
+header {
+  position: sticky; top: 0; z-index: 5; background: var(--bg);
+  padding: calc(14px + env(safe-area-inset-top)) 16px 0;
+  margin-top: calc(-1 * env(safe-area-inset-top));
+  border-bottom: 1px solid var(--line);
+}
+.title-row { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+h1 { font-size: 23px; font-weight: 500; letter-spacing: -0.04em; }
+.text-btn { min-height: 44px; padding: 0 4px; color: var(--accent); font-size: 14px; }
+.tabs { display: flex; gap: 24px; margin-top: 4px; }
+.tabs button {
+  min-height: 44px; border-radius: 0; color: var(--muted); font-size: 15px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 500; }
+
+main { padding: 0 16px; max-width: 760px; margin: 0 auto; }
+.empty { color: var(--muted); padding: 32px 0; font-size: 14px; }
+
+.btn {
+  min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 2px;
+  background: var(--bg); color: var(--ink); font-size: 15px;
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 500; }
+.btn.danger { color: var(--red); border-color: var(--line); }
+.btn:disabled { opacity: .4; }
+
+/* active list */
+.list-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 8px; }
+.list-head .count { color: var(--muted); font-size: 12px; }
+.row-item {
+  display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; align-items: baseline;
+  width: 100%; text-align: left; padding: 16px 0; border-bottom: 1px solid var(--line); border-radius: 0;
+}
+.list .row-item:first-child { border-top: 1px solid var(--line); }
+.mm-num { font-size: 28px; line-height: 1.1; font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; white-space: nowrap; }
+.mm-num small { font-size: 12px; color: var(--muted); margin-left: 2px; letter-spacing: 0; }
+.row-item .name { font-size: 16px; font-weight: 500; overflow-wrap: anywhere; }
+.row-item .note { font-size: 14px; color: var(--ink); margin-top: 2px; overflow-wrap: anywhere; }
+.row-item .since { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* gallery */
+.toolbar { padding: 16px 0 4px; display: flex; flex-direction: column; gap: 12px; }
+.search {
+  width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 2px;
+  padding: 9px 10px; font-size: 16px; outline: none;
+}
+.filters { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.filter {
+  flex: none; min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 2px;
+  font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.filter[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.group-title { font-size: 12px; color: var(--muted); padding: 20px 0 8px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
+@media (min-width: 560px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tile { text-align: left; display: block; width: 100%; }
+.tile .ph {
+  aspect-ratio: 1; background: var(--surface); border-radius: 2px; overflow: hidden; position: relative;
+  display: grid; place-items: center; color: var(--muted); font-size: 12px;
+}
+.tile .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tile .count { position: absolute; right: 6px; bottom: 6px; background: var(--bg); color: var(--ink); font-size: 11px; padding: 0 5px; border-radius: 2px; }
+.tile .name { font-size: 14px; font-weight: 500; margin-top: 6px; overflow-wrap: anywhere; }
+.tile .sub { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* sheets */
+dialog {
+  border: 1px solid var(--line); padding: 0; margin: auto auto 0; width: 100%; max-width: 560px;
+  max-height: 92vh; background: var(--bg); color: var(--ink); border-radius: 3px 3px 0 0;
+}
+dialog::backdrop { background: rgba(51, 51, 48, .27); }
+@media (min-width: 600px) { dialog { margin: auto; border-radius: 3px; } }
+.sheet { padding: 16px 16px calc(20px + env(safe-area-inset-bottom)); overflow-y: auto; max-height: 92vh; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.sheet-head h2 { font-size: 18px; font-weight: 500; overflow-wrap: anywhere; }
+.sheet-head .text-btn { color: var(--muted); flex: none; }
+label.f { display: block; font-size: 12px; color: var(--muted); margin: 16px 0 6px; }
+.input {
+  width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 2px;
+  padding: 10px; font-size: 16px; outline: none;
+}
+.input:focus, .search:focus { border-color: var(--accent); }
+.input:focus-visible, .search:focus-visible { outline: 1px solid var(--accent); outline-offset: 0; }
+textarea.input { min-height: 64px; resize: vertical; }
+.mm-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.mm-grid button {
+  min-height: 44px; border: 1px solid var(--line); border-radius: 2px;
+  font-size: 17px; font-variant-numeric: tabular-nums;
+}
+.mm-grid button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.mm-custom { margin-top: 6px; }
+.actions { display: flex; gap: 8px; margin-top: 20px; }
+.actions .btn { flex: 1; }
+.sub-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.sub-actions .btn { flex: 1; }
+.hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+.lead { font-size: 15px; margin-top: 12px; }
+.lead .mm-num { font-size: 20px; }
+
+.photos { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 16px -16px 0; padding: 0 16px; }
+.photos .p { flex: none; width: 84%; max-width: 420px; scroll-snap-align: center; position: relative; }
+.photos img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 2px; display: block; background: var(--surface); }
+.photos .del {
+  position: absolute; top: 8px; right: 8px; min-height: 32px; padding: 0 10px;
+  background: var(--bg); color: var(--ink); font-size: 12px; border: 1px solid var(--line);
+}
+.add-photo {
+  flex: none; width: 84%; max-width: 420px; aspect-ratio: 1; scroll-snap-align: center;
+  border: 1px dashed var(--line); border-radius: 2px; color: var(--accent); font-size: 14px;
+}
+.pending-photos { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.pending-photos img { width: 64px; height: 64px; object-fit: cover; border-radius: 2px; }
+.facts { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.facts .dates { font-size: 12px; color: var(--muted); }
+.facts .note { font-size: 14px; color: var(--ink); margin-top: 4px; overflow-wrap: anywhere; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  background: var(--bg); color: var(--accent); border: 1px solid var(--line); border-radius: 2px;
+  padding: 10px 16px; font-size: 13px; z-index: 50; opacity: 0; transition: opacity .2s;
+  pointer-events: none; max-width: calc(100% - 32px);
+}
+.toast.show { opacity: 1; }
+.busy { position: fixed; inset: 0; background: rgba(255,255,255,.7); display: none; place-items: center; z-index: 60; color: var(--muted); }
+.busy.show { display: grid; }
+.mm-num .unknown { font-size: 13px; color: var(--muted); letter-spacing: 0; }
+.input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 44px; }
+.bulk-tools { display: flex; gap: 8px; margin-top: 16px; }
+.bulk-tools .btn { flex: 1; padding: 0 8px; }
+.bulk-row { padding: 16px 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.bulk-ph { display: flex; gap: 6px; overflow-x: auto; }
+.bulk-ph img { width: 64px; height: 64px; object-fit: cover; border-radius: 2px; flex: none; }
+.bulk-ph span { font-size: 12px; color: var(--muted); }
+.bulk-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.bulk-actions { display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
+.bulk-src { margin-right: auto; font-size: 12px; color: var(--muted); }
+.bulk-actions .text-btn { min-height: 36px; font-size: 13px; }
+.bulk-actions .text-btn.remove { color: var(--muted); }
+.bulk-foot { position: sticky; bottom: calc(-20px - env(safe-area-inset-bottom)); background: var(--bg); padding: 12px 0 calc(20px + env(safe-area-inset-bottom)); margin-bottom: calc(-20px - env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
+.bulk-foot .btn { width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="title-row">
+    <h1>뜨개 기록</h1>
+    <button class="text-btn" id="settingsBtn">백업</button>
+  </div>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tabActive" aria-selected="true">진행 중</button>
+    <button role="tab" id="tabDone" aria-selected="false">완성</button>
+  </div>
+</header>
+
+<main>
+  <section id="activeView"></section>
+  <section id="doneView" hidden></section>
+</main>
+
+<!-- add / edit an active project -->
+<dialog id="editDlg">
+  <form class="sheet" method="dialog" id="editForm">
+    <div class="sheet-head">
+      <h2 id="editTitle">새 작품</h2>
+      <button type="button" class="text-btn" data-close>닫기</button>
+    </div>
+    <label class="f" for="nameIn">작품 이름</label>
+    <input class="input" id="nameIn" placeholder="예: 하늘색 미니백" autocomplete="off" maxlength="60">
+    <label class="f">코바늘 호수</label>
+    <div class="mm-grid" id="mmGrid"></div>
+    <input class="input mm-custom" id="mmCustom" inputmode="decimal" placeholder="목록에 없으면 직접 입력 (예: 3.75)">
+    <p class="hint" id="mmOptionalHint" hidden>완성작은 호수를 비워둘 수 있습니다. 선택한 호수를 다시 누르면 해제됩니다.</p>
+    <div id="doneAtWrap" hidden>
+      <label class="f" for="doneAtIn">완성일</label>
+      <input class="input" id="doneAtIn" type="date">
+    </div>
+    <label class="f" for="noteIn">메모 (선택)</label>
+    <textarea class="input" id="noteIn" placeholder="예: 바닥 4mm, 몸통 5mm" maxlength="200"></textarea>
+    <div class="actions">
+      <button type="button" class="btn primary" id="saveBtn">저장</button>
+    </div>
+    <div class="sub-actions" id="editExtra">
+      <button type="button" class="btn" id="finishBtn">완성 처리</button>
+      <button type="button" class="btn danger" id="deleteBtn">삭제</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- mark finished, with optional photos -->
+<dialog id="finishDlg">
+  <form class="sheet" method="dialog">
+    <div class="sheet-head">
+      <h2>완성 처리</h2>
+      <button type="button" class="text-btn" data-close>닫기</button>
+    </div>
+    <p class="lead" id="finishName"></p>
+    <label class="f">완성 사진 (선택)</label>
+    <button type="button" class="btn" id="finishPickBtn" style="width:100%">사진 찍기 또는 고르기</button>
+    <div class="pending-photos" id="finishPhotos"></div>
+    <div class="actions">
+      <button type="button" class="btn primary" id="finishConfirmBtn">완성 목록으로 옮기기</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- finished project detail -->
+<dialog id="detailDlg">
+  <form class="sheet" method="dialog">
+    <div class="sheet-head">
+      <h2 id="detailName"></h2>
+      <button type="button" class="text-btn" data-close>닫기</button>
+    </div>
+    <div class="photos" id="detailPhotos"></div>
+    <div class="facts">
+      <div class="mm-num" id="detailMm"></div>
+      <div>
+        <div class="dates" id="detailFacts"></div>
+        <div class="note" id="detailNote"></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn" id="detailEditBtn">수정</button>
+      <button type="button" class="btn" id="reopenBtn">진행 중으로</button>
+      <button type="button" class="btn danger" id="detailDeleteBtn">삭제</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- add finished projects directly, in bulk -->
+<dialog id="bulkDlg">
+  <form class="sheet" method="dialog">
+    <div class="sheet-head">
+      <h2>완성작 추가</h2>
+      <button type="button" class="text-btn" data-close>닫기</button>
+    </div>
+    <p class="hint">사진 한 장이 작품 하나가 되고, 찍은 날짜순으로 정렬됩니다. 같은 작품 사진은 '앞 작품에 합치기'로 묶으세요. 완성일은 사진 찍은 날로 채워집니다.</p>
+    <label class="f" for="bulkDate">기본 완성일 (사진 날짜가 없을 때)</label>
+    <input class="input" id="bulkDate" type="date">
+    <div class="bulk-tools">
+      <button type="button" class="btn" id="bulkPhotosBtn">사진으로 추가</button>
+      <button type="button" class="btn" id="bulkRowBtn">사진 없이 추가</button>
+    </div>
+    <p class="empty" id="bulkEmpty">추가할 작품이 없습니다.</p>
+    <div id="bulkRows"></div>
+    <div class="bulk-foot">
+      <button type="button" class="btn primary" id="bulkSaveBtn">완성 목록에 추가</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- backup -->
+<dialog id="backupDlg">
+  <form class="sheet" method="dialog">
+    <div class="sheet-head">
+      <h2>백업</h2>
+      <button type="button" class="text-btn" data-close>닫기</button>
+    </div>
+    <p class="lead">기록과 사진은 이 아이폰에만 저장됩니다. 백업 파일을 만들어 iCloud Drive에 보관하세요.</p>
+    <div class="actions">
+      <button type="button" class="btn primary" id="exportBtn">백업 파일 만들기</button>
+      <button type="button" class="btn" id="importBtn">불러오기</button>
+    </div>
+    <p class="hint" id="backupInfo"></p>
+  </form>
+</dialog>
+
+<input type="file" id="photoInput" accept="image/*" multiple hidden>
+<input type="file" id="importInput" accept="application/json,.json" hidden>
+<div class="toast" id="toast"></div>
+<div class="busy" id="busy">처리 중…</div>
+
+<script>
+"use strict";
+
+const MM_PRESETS = [2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0];
+const FULL_MAX = 1600, THUMB_MAX = 480;
+
+/* ---------- storage (IndexedDB) ---------- */
+let db;
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open("knitlog", 1);
+    req.onupgradeneeded = () => {
+      const d = req.result;
+      d.createObjectStore("projects", { keyPath: "id" });
+      d.createObjectStore("photos", { keyPath: "id" }).createIndex("projectId", "projectId");
+      d.createObjectStore("fulls", { keyPath: "id" });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function run(stores, mode, fn) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(stores, mode);
+    let out;
+    Promise.resolve(fn(tx)).then(v => { out = v; });
+    tx.oncomplete = () => resolve(out);
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+const reqP = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+const getAll = name => run([name], "readonly", tx => reqP(tx.objectStore(name).getAll()));
+const putProject = p => run(["projects"], "readwrite", tx => { tx.objectStore("projects").put(p); });
+
+/* ---------- state ---------- */
+let projects = [];
+let photos = [];            // {id, projectId, createdAt, thumb: Blob}
+const thumbUrls = new Map();
+let tab = "active";
+let galleryMm = null, galleryQuery = "";
+
+const $ = s => document.querySelector(s);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtMm = n => { const s = Number(n).toFixed(2); return s.endsWith("0") ? s.slice(0, -1) : s; };
+const mmHtml = n => n == null ? `<span class="unknown">호수 모름</span>` : `${fmtMm(n)}<small>mm</small>`;
+const mmText = n => n == null ? "호수 모름" : `${fmtMm(n)}mm`;
+const pad2 = n => String(n).padStart(2, "0");
+const toDateInput = t => { const d = new Date(t); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
+const fromDateInput = v => { const [y, m, d] = v.split("-").map(Number); return new Date(y, m - 1, d, 12).getTime(); };
+function parseMm(v) {
+  v = String(v ?? "").trim().replace(",", ".");
+  if (!v) return null;
+  const n = parseFloat(v);
+  return n > 0 && n < 40 ? Math.round(n * 100) / 100 : NaN;
+}
+const fmtDate = t => { const d = new Date(t); return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`; };
+
+function sinceText(t) {
+  const days = Math.floor((Date.now() - t) / 86400000);
+  if (days <= 0) return "오늘 수정";
+  if (days < 30) return `${days}일 전 수정`;
+  if (days < 365) return `${Math.floor(days / 30)}달 전 수정`;
+  return `${Math.floor(days / 365)}년 전 수정`;
+}
+function thumbUrl(ph) {
+  if (!thumbUrls.has(ph.id)) thumbUrls.set(ph.id, URL.createObjectURL(ph.thumb));
+  return thumbUrls.get(ph.id);
+}
+function photosOf(pid) {
+  return photos.filter(p => p.projectId === pid).sort((a, b) => a.createdAt - b.createdAt);
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = $("#toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
+}
+const busy = on => $("#busy").classList.toggle("show", on);
+
+/* ---------- rendering ---------- */
+
+function render() {
+  $("#tabActive").setAttribute("aria-selected", tab === "active");
+  $("#tabDone").setAttribute("aria-selected", tab === "done");
+  $("#activeView").hidden = tab !== "active";
+  $("#doneView").hidden = tab !== "done";
+  tab === "active" ? renderActive() : renderDone();
+}
+
+const ADD_HEAD = label => `<div class="list-head"><span class="count">${label}</span><button class="btn primary" id="addBtn">작품 추가</button></div>`;
+
+function renderActive() {
+  const list = projects.filter(p => p.status === "active").sort((a, b) => b.updatedAt - a.updatedAt);
+  if (!list.length) {
+    $("#activeView").innerHTML = `${ADD_HEAD("진행 중인 작품 없음")}<p class="empty">작품 이름과 코바늘 호수를 기록하세요.</p>`;
+    return;
+  }
+  $("#activeView").innerHTML = ADD_HEAD(`진행 중 ${list.length}개`) + `<div class="list">${list.map(p => `
+    <button class="row-item" data-edit="${p.id}">
+      <div class="mm-num">${mmHtml(p.mm)}</div>
+      <div>
+        <div class="name">${esc(p.name)}</div>
+        ${p.note ? `<div class="note">${esc(p.note)}</div>` : ""}
+        <div class="since">${sinceText(p.updatedAt)}</div>
+      </div>
+    </button>`).join("")}</div>`;
+}
+
+function renderDone() {
+  const done = projects.filter(p => p.status === "done");
+  const head = label => `<div class="list-head"><span class="count">${label}</span><button class="btn primary" id="bulkBtn">완성작 추가</button></div>`;
+  if (!done.length) {
+    $("#doneView").innerHTML = `${head("완성한 작품 없음")}<p class="empty">진행 중인 작품을 '완성 처리'하거나, 이미 완성한 작품을 사진과 함께 한꺼번에 추가하세요.</p>`;
+    return;
+  }
+  const mms = [...new Set(done.map(p => p.mm).filter(m => m != null))].sort((a, b) => a - b);
+  const hasUnknown = done.some(p => p.mm == null);
+  if (galleryMm === "none" ? !hasUnknown : galleryMm !== null && !mms.includes(galleryMm)) galleryMm = null;
+  const q = galleryQuery.trim().toLowerCase();
+  const shown = done
+    .filter(p => galleryMm === null || (galleryMm === "none" ? p.mm == null : p.mm === galleryMm))
+    .filter(p => !q || p.name.toLowerCase().includes(q) || (p.note || "").toLowerCase().includes(q))
+    .sort((a, b) => b.doneAt - a.doneAt);
+
+  const groups = [];
+  for (const p of shown) {
+    const d = new Date(p.doneAt);
+    const key = `${d.getFullYear()}년 ${d.getMonth() + 1}월`;
+    if (!groups.length || groups[groups.length - 1].key !== key) groups.push({ key, items: [] });
+    groups[groups.length - 1].items.push(p);
+  }
+
+  const toolbar = head(`완성 ${done.length}개`) + `
+    <div class="toolbar">
+      <input class="search" id="searchIn" type="search" placeholder="작품 이름 검색" value="${esc(galleryQuery)}">
+      <div class="filters">
+        <button class="filter" data-mm="" aria-pressed="${galleryMm === null}">전체 ${done.length}</button>
+        ${mms.map(m => `<button class="filter" data-mm="${m}" aria-pressed="${galleryMm === m}">${fmtMm(m)}mm</button>`).join("")}
+        ${hasUnknown ? `<button class="filter" data-mm="none" aria-pressed="${galleryMm === "none"}">호수 모름</button>` : ""}
+      </div>
+    </div>`;
+  const body = groups.length ? groups.map(g => `
+    <div class="group-title">${g.key}</div>
+    <div class="grid">${g.items.map(p => {
+      const ph = photosOf(p.id);
+      return `<button class="tile" data-detail="${p.id}">
+        <div class="ph">${ph.length ? `<img src="${thumbUrl(ph[0])}" alt="" loading="lazy">` : "사진 없음"}
+          ${ph.length > 1 ? `<span class="count">${ph.length}</span>` : ""}</div>
+        <div class="name">${esc(p.name)}</div><div class="sub">${mmText(p.mm)} · ${fmtDate(p.doneAt)}</div>
+      </button>`;
+    }).join("")}</div>`).join("") : `<p class="empty">조건에 맞는 작품이 없습니다.</p>`;
+
+  const hadFocus = document.activeElement && document.activeElement.id === "searchIn";
+  $("#doneView").innerHTML = toolbar + body;
+  if (hadFocus) { const s = $("#searchIn"); s.focus(); s.setSelectionRange(s.value.length, s.value.length); }
+}
+
+/* ---------- add / edit ---------- */
+let editing = null, selectedMm = null;
+
+function renderMmGrid() {
+  $("#mmGrid").innerHTML = MM_PRESETS.map(m =>
+    `<button type="button" data-pick="${m}" aria-pressed="${selectedMm === m}">${fmtMm(m)}</button>`).join("");
+}
+function openEdit(p) {
+  editing = p || null;
+  $("#editTitle").textContent = p ? "작품 수정" : "새 작품";
+  $("#nameIn").value = p ? p.name : "";
+  $("#noteIn").value = p ? (p.note || "") : "";
+  selectedMm = p ? p.mm : null;
+  $("#mmCustom").value = p && p.mm != null && !MM_PRESETS.includes(p.mm) ? p.mm : "";
+  const isDone = !!p && p.status === "done";
+  $("#editExtra").hidden = !p;
+  $("#finishBtn").hidden = isDone;
+  $("#doneAtWrap").hidden = !isDone;
+  $("#mmOptionalHint").hidden = !isDone;
+  if (isDone) $("#doneAtIn").value = toDateInput(p.doneAt);
+  renderMmGrid();
+  $("#editDlg").showModal();
+  if (!p) setTimeout(() => $("#nameIn").focus(), 50);
+}
+function readMm() {
+  const custom = parseMm($("#mmCustom").value);
+  return custom === null ? selectedMm : custom;
+}
+async function saveEdit() {
+  const name = $("#nameIn").value.trim();
+  const mm = readMm();
+  if (!name) { toast("작품 이름을 입력하세요"); $("#nameIn").focus(); return; }
+  const isDone = !!editing && editing.status === "done";
+  if (mm === null && !isDone) { toast("코바늘 호수를 선택하세요"); return; }
+  if (isDone && !$("#doneAtIn").value) { toast("완성일을 입력하세요"); $("#doneAtIn").focus(); return; }
+  if (Number.isNaN(mm)) { toast("호수는 숫자로 입력하세요 (예: 3.75)"); $("#mmCustom").focus(); return; }
+  const now = Date.now();
+  const p = editing
+    ? { ...editing, name, mm, note: $("#noteIn").value.trim(), updatedAt: now }
+    : null;
+  if (p && isDone) {
+    p.doneAt = fromDateInput($("#doneAtIn").value);
+    if (p.startUnknown || p.createdAt > p.doneAt) p.createdAt = p.doneAt;
+  }
+  const saved = p ||
+    { id: uid(), name, mm, note: $("#noteIn").value.trim(), status: "active", createdAt: now, updatedAt: now, doneAt: null };
+  await putProject(saved);
+  upsertLocal(saved);
+  $("#editDlg").close();
+  toast(editing ? "수정했습니다" : `${name} · ${mmText(mm)} 기록했습니다`);
+  render();
+}
+function upsertLocal(p) {
+  const i = projects.findIndex(x => x.id === p.id);
+  if (i >= 0) projects[i] = p; else projects.push(p);
+}
+async function deleteProject(p) {
+  if (!confirm(`'${p.name}'을(를) 삭제할까요? 사진도 함께 지워지며 되돌릴 수 없습니다.`)) return false;
+  const ids = photosOf(p.id).map(x => x.id);
+  await run(["projects", "photos", "fulls"], "readwrite", tx => {
+    tx.objectStore("projects").delete(p.id);
+    for (const id of ids) { tx.objectStore("photos").delete(id); tx.objectStore("fulls").delete(id); }
+  });
+  projects = projects.filter(x => x.id !== p.id);
+  photos = photos.filter(x => x.projectId !== p.id);
+  ids.forEach(id => { if (thumbUrls.has(id)) { URL.revokeObjectURL(thumbUrls.get(id)); thumbUrls.delete(id); } });
+  toast("삭제했습니다");
+  render();
+  return true;
+}
+
+/* ---------- photos ---------- */
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => resolve({ img, url });
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("이미지를 읽지 못했습니다")); };
+    img.src = url;
+  });
+}
+function scaleTo(img, max, quality) {
+  const r = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+  const c = document.createElement("canvas");
+  c.width = Math.round(img.naturalWidth * r); c.height = Math.round(img.naturalHeight * r);
+  c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+  return new Promise(res => c.toBlob(res, "image/jpeg", quality));
+}
+async function processFile(file) {
+  const takenAt = await photoDate(file);
+  const { img, url } = await loadImage(file);
+  try {
+    return { full: await scaleTo(img, FULL_MAX, 0.85), thumb: await scaleTo(img, THUMB_MAX, 0.8), takenAt };
+  } finally { URL.revokeObjectURL(url); }
+}
+
+// Shooting date from the photo's EXIF block (JPEG APP1 or HEIC Exif item), as local noon ms; null if absent.
+async function photoDate(file) {
+  try {
+    const isHeic = /hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name);
+    const head = new Uint8Array(await file.slice(0, 512 * 1024).arrayBuffer());
+    const found = scanExif(head);
+    if (found || !isHeic) return found;
+    return scanExif(new Uint8Array(await file.arrayBuffer()));
+  } catch { return null; }
+}
+function scanExif(b) {
+  for (let i = 0; i + 14 < b.length; i++) {
+    // "Exif\0\0" marks the start of a TIFF-structured EXIF block.
+    if (b[i] === 0x45 && b[i + 1] === 0x78 && b[i + 2] === 0x69 && b[i + 3] === 0x66 && b[i + 4] === 0 && b[i + 5] === 0) {
+      try { const t = readExifDate(b, i + 6); if (t) return t; } catch { /* malformed block; keep scanning */ }
+    }
+  }
+  return null;
+}
+function readExifDate(b, start) {
+  const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  const order = dv.getUint16(start);
+  const le = order === 0x4949;
+  if (!le && order !== 0x4d4d) return null;
+  const u16 = o => dv.getUint16(start + o, le), u32 = o => dv.getUint32(start + o, le);
+  if (u16(2) !== 42) return null;
+  const ifd = off => {
+    const tags = {};
+    for (let k = 0, n = u16(off); k < n; k++) {
+      const e = off + 2 + k * 12;
+      tags[u16(e)] = { count: u32(e + 4), value: u32(e + 8), at: e + 8 };
+    }
+    return tags;
+  };
+  const ascii = (tag) => {
+    const off = tag.count > 4 ? tag.value : tag.at;
+    let out = "";
+    for (let k = 0; k < Math.min(tag.count, 32); k++) { const c = b[start + off + k]; if (!c) break; out += String.fromCharCode(c); }
+    return out;
+  };
+  const ifd0 = ifd(u32(4));
+  let text = "";
+  if (ifd0[0x8769]) {
+    const exif = ifd(ifd0[0x8769].value);
+    const tag = exif[0x9003] || exif[0x9004];      // DateTimeOriginal, DateTimeDigitized
+    if (tag) text = ascii(tag);
+  }
+  if (!text && ifd0[0x0132]) text = ascii(ifd0[0x0132]);  // DateTime
+  const m = text.match(/^(\d{4}):(\d{2}):(\d{2})/);
+  if (!m || +m[1] < 1990) return null;
+  return new Date(+m[1], +m[2] - 1, +m[3], 12).getTime();
+}
+async function addPhotos(projectId, processed) {
+  const now = Date.now();
+  const recs = processed.map((x, i) => ({ id: uid(), projectId, createdAt: now + i, thumb: x.thumb, full: x.full }));
+  await run(["photos", "fulls"], "readwrite", tx => {
+    for (const r of recs) {
+      tx.objectStore("photos").put({ id: r.id, projectId, createdAt: r.createdAt, thumb: r.thumb });
+      tx.objectStore("fulls").put({ id: r.id, full: r.full });
+    }
+  });
+  for (const r of recs) photos.push({ id: r.id, projectId, createdAt: r.createdAt, thumb: r.thumb });
+}
+let photoPickHandler = null;
+function pickPhotos(handler) {
+  photoPickHandler = handler;
+  $("#photoInput").value = "";
+  $("#photoInput").click();
+}
+$("#photoInput").addEventListener("change", async e => {
+  const files = [...e.target.files];
+  if (!files.length || !photoPickHandler) return;
+  busy(true);
+  try {
+    const out = [];
+    for (const f of files) {
+      try { out.push(await processFile(f)); } catch (err) { toast(err.message); }
+    }
+    if (out.length) await photoPickHandler(out);
+  } finally { busy(false); }
+});
+
+/* ---------- finish flow ---------- */
+let finishing = null, finishPending = [];
+function openFinish(p) {
+  finishing = p; finishPending = [];
+  $("#finishName").textContent = `${p.name} · ${mmText(p.mm)}`;
+  $("#finishPhotos").innerHTML = "";
+  $("#editDlg").close();
+  $("#finishDlg").showModal();
+}
+function renderFinishPending() {
+  $("#finishPhotos").innerHTML = finishPending.map(x => `<img src="${URL.createObjectURL(x.thumb)}" alt="">`).join("");
+}
+async function confirmFinish() {
+  const p = { ...finishing, status: "done", doneAt: Date.now(), updatedAt: Date.now() };
+  busy(true);
+  try {
+    await putProject(p);
+    upsertLocal(p);
+    if (finishPending.length) await addPhotos(p.id, finishPending);
+  } finally { busy(false); }
+  $("#finishDlg").close();
+  tab = "done";
+  render();
+  toast("완성 목록으로 옮겼습니다");
+}
+
+/* ---------- bulk add finished ---------- */
+let bulkRows = [];          // {name, mm, date, dateFrom: "photo"|"default"|"manual", photos: [{full, thumb, takenAt}]}
+const bulkUrls = [];
+function openBulk() {
+  bulkRows = [];
+  $("#bulkDate").value = toDateInput(Date.now());
+  renderBulk();
+  $("#bulkDlg").showModal();
+}
+function newBulkRow(photos) {
+  const taken = photos.map(x => x.takenAt).filter(Boolean);
+  return taken.length
+    ? { name: "", mm: "", date: toDateInput(Math.max(...taken)), dateFrom: "photo", photos }
+    : { name: "", mm: "", date: $("#bulkDate").value || toDateInput(Date.now()), dateFrom: "default", photos };
+}
+const DATE_FROM = { photo: "완성일: 사진 찍은 날", default: "사진 날짜 없음 · 기본 완성일" };
+function renderBulk() {
+  bulkUrls.splice(0).forEach(u => URL.revokeObjectURL(u));
+  const url = b => { const u = URL.createObjectURL(b); bulkUrls.push(u); return u; };
+  $("#bulkRows").innerHTML = bulkRows.map((r, i) => `
+    <div class="bulk-row" data-row="${i}">
+      <div class="bulk-ph">${r.photos.length ? r.photos.map(x => `<img src="${url(x.thumb)}" alt="">`).join("") : `<span>사진 없음</span>`}</div>
+      <input class="input" data-field="name" placeholder="작품 이름" value="${esc(r.name)}" maxlength="60" autocomplete="off">
+      <div class="bulk-pair">
+        <input class="input" data-field="mm" inputmode="decimal" placeholder="호수 mm (모르면 비움)" value="${esc(r.mm)}">
+        <input class="input" data-field="date" type="date" value="${esc(r.date)}" aria-label="완성일">
+      </div>
+      <div class="bulk-actions">
+        <span class="bulk-src">${r.photos.length ? DATE_FROM[r.dateFrom] || "" : ""}</span>
+        ${i > 0 && r.photos.length ? `<button type="button" class="text-btn" data-merge="${i}">앞 작품에 합치기</button>` : ""}
+        <button type="button" class="text-btn remove" data-remove="${i}">빼기</button>
+      </div>
+    </div>`).join("");
+  $("#bulkEmpty").hidden = bulkRows.length > 0;
+  $("#bulkSaveBtn").disabled = !bulkRows.length;
+  $("#bulkSaveBtn").textContent = bulkRows.length ? `${bulkRows.length}개 완성 목록에 추가` : "완성 목록에 추가";
+}
+function mergeBulkRow(i) {
+  const prev = bulkRows[i - 1], cur = bulkRows[i];
+  prev.photos.push(...cur.photos);
+  // A merged row is finished on its latest photo's day unless the date was typed in.
+  if (prev.dateFrom !== "manual") { const d = newBulkRow(prev.photos); prev.date = d.date; prev.dateFrom = d.dateFrom; }
+  if (!prev.name) prev.name = cur.name;
+  if (!prev.mm) prev.mm = cur.mm;
+  bulkRows.splice(i, 1);
+  renderBulk();
+}
+function closeBulk() {
+  if (bulkRows.length && !confirm("입력한 완성작을 저장하지 않고 닫을까요?")) return;
+  bulkRows = [];
+  $("#bulkDlg").close();
+}
+async function saveBulk() {
+  const field = (i, name) => $(`[data-row="${i}"] [data-field="${name}"]`);
+  for (let i = 0; i < bulkRows.length; i++) {
+    const r = bulkRows[i];
+    if (!r.name.trim()) { toast(`${i + 1}번째 작품 이름을 입력하세요`); field(i, "name").focus(); return; }
+    if (Number.isNaN(parseMm(r.mm))) { toast(`${i + 1}번째 호수는 숫자로 입력하세요`); field(i, "mm").focus(); return; }
+    if (!r.date) { toast(`${i + 1}번째 완성일을 입력하세요`); field(i, "date").focus(); return; }
+  }
+  const now = Date.now();
+  const newProjects = [], newPhotos = [];
+  bulkRows.forEach((r, i) => {
+    const doneAt = fromDateInput(r.date);
+    const p = { id: uid(), name: r.name.trim(), mm: parseMm(r.mm), note: "", status: "done",
+      createdAt: doneAt, updatedAt: now, doneAt, startUnknown: true };
+    newProjects.push(p);
+    r.photos.forEach((x, j) => newPhotos.push({ id: uid(), projectId: p.id, createdAt: now + i * 100 + j, thumb: x.thumb, full: x.full }));
+  });
+  busy(true);
+  try {
+    await run(["projects", "photos", "fulls"], "readwrite", tx => {
+      for (const p of newProjects) tx.objectStore("projects").put(p);
+      for (const r of newPhotos) {
+        tx.objectStore("photos").put({ id: r.id, projectId: r.projectId, createdAt: r.createdAt, thumb: r.thumb });
+        tx.objectStore("fulls").put({ id: r.id, full: r.full });
+      }
+    });
+  } catch (e) {
+    toast("저장하지 못했습니다"); return;
+  } finally { busy(false); }
+  projects.push(...newProjects);
+  for (const r of newPhotos) photos.push({ id: r.id, projectId: r.projectId, createdAt: r.createdAt, thumb: r.thumb });
+  bulkRows = [];
+  $("#bulkDlg").close();
+  galleryMm = null; galleryQuery = "";
+  render();
+  toast(`${newProjects.length}개를 완성 목록에 추가했습니다`);
+}
+
+/* ---------- detail ---------- */
+let detailing = null;
+const fullUrls = [];
+async function openDetail(p) {
+  detailing = p;
+  $("#detailName").textContent = p.name;
+  $("#detailMm").innerHTML = mmHtml(p.mm);
+  const days = Math.max(1, Math.round((p.doneAt - p.createdAt) / 86400000));
+  $("#detailFacts").textContent = p.startUnknown
+    ? `${fmtDate(p.doneAt)} 완성`
+    : `${fmtDate(p.createdAt)} 시작 · ${fmtDate(p.doneAt)} 완성 · ${days}일`;
+  $("#detailNote").textContent = p.note || "";
+  $("#detailNote").hidden = !p.note;
+  await renderDetailPhotos();
+  if (!$("#detailDlg").open) $("#detailDlg").showModal();
+}
+async function renderDetailPhotos() {
+  fullUrls.splice(0).forEach(u => URL.revokeObjectURL(u));
+  const ph = photosOf(detailing.id);
+  const fulls = await run(["fulls"], "readonly", tx => Promise.all(ph.map(x => reqP(tx.objectStore("fulls").get(x.id)))));
+  $("#detailPhotos").innerHTML = ph.map((x, i) => {
+    const blob = fulls[i] ? fulls[i].full : x.thumb;
+    const u = URL.createObjectURL(blob); fullUrls.push(u);
+    return `<div class="p"><img src="${u}" alt=""><button type="button" class="del" data-delphoto="${x.id}" >삭제</button></div>`;
+  }).join("") + `<button type="button" class="add-photo" id="detailAddPhoto">사진 추가</button>`;
+}
+async function deletePhoto(id) {
+  if (!confirm("이 사진을 지울까요?")) return;
+  await run(["photos", "fulls"], "readwrite", tx => { tx.objectStore("photos").delete(id); tx.objectStore("fulls").delete(id); });
+  photos = photos.filter(x => x.id !== id);
+  if (thumbUrls.has(id)) { URL.revokeObjectURL(thumbUrls.get(id)); thumbUrls.delete(id); }
+  await renderDetailPhotos();
+  render();
+}
+
+/* ---------- backup ---------- */
+const blobToDataUrl = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(b); });
+const dataUrlToBlob = async u => (await fetch(u)).blob();
+
+async function exportBackup() {
+  busy(true);
+  try {
+    const fulls = await getAll("fulls");
+    const fullMap = new Map(fulls.map(f => [f.id, f.full]));
+    const outPhotos = [];
+    for (const p of photos) {
+      outPhotos.push({ id: p.id, projectId: p.projectId, createdAt: p.createdAt,
+        thumb: await blobToDataUrl(p.thumb), full: fullMap.has(p.id) ? await blobToDataUrl(fullMap.get(p.id)) : null });
+    }
+    const data = { app: "knit-log", version: 1, exportedAt: new Date().toISOString(), projects, photos: outPhotos };
+    const d = new Date();
+    const name = `knit-log-backup-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}.json`;
+    const file = new File([JSON.stringify(data)], name, { type: "application/json" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: "뜨개 기록 백업" }); }
+      catch (e) { if (e.name !== "AbortError") throw e; }
+    } else {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(file); a.download = name; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    }
+  } catch (e) {
+    toast("백업 파일을 만들지 못했습니다");
+  } finally { busy(false); }
+}
+async function importBackup(file) {
+  let data;
+  try { data = JSON.parse(await file.text()); } catch { toast("백업 파일을 읽지 못했습니다"); return; }
+  if (data.app !== "knit-log" || !Array.isArray(data.projects)) { toast("뜨개 기록 백업 파일이 아닙니다"); return; }
+  const n = data.projects.length, m = (data.photos || []).length;
+  if (!confirm(`작품 ${n}개, 사진 ${m}장을 불러올까요? 같은 작품은 백업 내용으로 덮어씁니다.`)) return;
+  busy(true);
+  try {
+    const recs = [];
+    for (const p of data.photos || []) {
+      const thumb = await dataUrlToBlob(p.thumb);
+      recs.push({ id: p.id, projectId: p.projectId, createdAt: p.createdAt, thumb, full: p.full ? await dataUrlToBlob(p.full) : thumb });
+    }
+    await run(["projects", "photos", "fulls"], "readwrite", tx => {
+      for (const p of data.projects) tx.objectStore("projects").put(p);
+      for (const r of recs) {
+        tx.objectStore("photos").put({ id: r.id, projectId: r.projectId, createdAt: r.createdAt, thumb: r.thumb });
+        tx.objectStore("fulls").put({ id: r.id, full: r.full });
+      }
+    });
+    await loadAll();
+    $("#backupDlg").close();
+    render();
+    toast(`작품 ${n}개를 불러왔습니다`);
+  } catch (e) {
+    toast("불러오지 못했습니다");
+  } finally { busy(false); }
+}
+
+/* ---------- wiring ---------- */
+document.addEventListener("click", e => {
+  const t = e.target.closest("button");
+  if (!t) return;
+  if (t.hasAttribute("data-close")) {
+    const d = t.closest("dialog");
+    d.id === "bulkDlg" ? closeBulk() : d.close();
+    return;
+  }
+  if (t.dataset.edit) { openEdit(projects.find(p => p.id === t.dataset.edit)); return; }
+  if (t.dataset.detail) { openDetail(projects.find(p => p.id === t.dataset.detail)); return; }
+  if (t.dataset.pick) {
+    const v = Number(t.dataset.pick);
+    selectedMm = selectedMm === v && editing && editing.status === "done" ? null : v;
+    $("#mmCustom").value = ""; renderMmGrid(); return;
+  }
+  if ("mm" in t.dataset && t.classList.contains("filter")) {
+    const v = t.dataset.mm;
+    galleryMm = v === "" ? null : v === "none" ? "none" : Number(v); renderDone(); return;
+  }
+  if (t.dataset.merge) { mergeBulkRow(Number(t.dataset.merge)); return; }
+  if (t.dataset.remove) { bulkRows.splice(Number(t.dataset.remove), 1); renderBulk(); return; }
+  if (t.id === "bulkBtn") { openBulk(); return; }
+  if (t.dataset.delphoto) { deletePhoto(t.dataset.delphoto); return; }
+  if (t.id === "addBtn") { openEdit(null); return; }
+  if (t.id === "detailAddPhoto") {
+    pickPhotos(async out => { await addPhotos(detailing.id, out); await renderDetailPhotos(); render(); toast("사진을 추가했습니다"); });
+  }
+});
+$("#tabActive").onclick = () => { tab = "active"; render(); };
+$("#tabDone").onclick = () => { tab = "done"; render(); };
+$("#saveBtn").onclick = saveEdit;
+$("#nameIn").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); saveEdit(); } });
+$("#mmCustom").addEventListener("input", () => { if ($("#mmCustom").value.trim()) { selectedMm = null; renderMmGrid(); } });
+$("#finishBtn").onclick = () => openFinish(editing);
+$("#deleteBtn").onclick = async () => { if (await deleteProject(editing)) $("#editDlg").close(); };
+$("#finishPickBtn").onclick = () => pickPhotos(out => { finishPending.push(...out); renderFinishPending(); });
+$("#finishConfirmBtn").onclick = confirmFinish;
+$("#reopenBtn").onclick = async () => {
+  const p = { ...detailing, status: "active", doneAt: null, updatedAt: Date.now() };
+  await putProject(p); upsertLocal(p);
+  $("#detailDlg").close(); tab = "active"; render(); toast("진행 중으로 옮겼습니다");
+};
+$("#detailEditBtn").onclick = () => { const p = detailing; $("#detailDlg").close(); openEdit(p); };
+$("#bulkPhotosBtn").onclick = () => pickPhotos(out => {
+  // Oldest first so photos of the same work sit next to each other; undated photos go last.
+  const sorted = out.map((x, i) => [x, i]).sort((a, b) =>
+    (a[0].takenAt ?? Infinity) - (b[0].takenAt ?? Infinity) || a[1] - b[1]).map(a => a[0]);
+  bulkRows.push(...sorted.map(x => newBulkRow([x])));
+  renderBulk();
+});
+$("#bulkDate").addEventListener("input", () => {
+  if (!$("#bulkDate").value) return;
+  bulkRows.forEach(r => { if (r.dateFrom === "default") r.date = $("#bulkDate").value; });
+  renderBulk();
+});
+$("#bulkRowBtn").onclick = () => {
+  bulkRows.push(newBulkRow([])); renderBulk();
+  $(`[data-row="${bulkRows.length - 1}"] [data-field="name"]`).focus();
+};
+$("#bulkSaveBtn").onclick = saveBulk;
+$("#bulkDlg").addEventListener("cancel", e => { e.preventDefault(); closeBulk(); });
+$("#detailDeleteBtn").onclick = async () => { if (await deleteProject(detailing)) $("#detailDlg").close(); };
+$("#settingsBtn").onclick = () => {
+  const done = projects.filter(p => p.status === "done").length;
+  $("#backupInfo").textContent = `진행 중 ${projects.length - done}개 · 완성 ${done}개 · 사진 ${photos.length}장`;
+  $("#backupDlg").showModal();
+};
+$("#exportBtn").onclick = exportBackup;
+$("#importBtn").onclick = () => { $("#importInput").value = ""; $("#importInput").click(); };
+$("#importInput").addEventListener("change", e => { if (e.target.files[0]) importBackup(e.target.files[0]); });
+document.addEventListener("input", e => {
+  if (e.target.id === "searchIn") { galleryQuery = e.target.value; renderDone(); return; }
+  const row = e.target.closest("[data-row]");
+  if (row && e.target.dataset.field) {
+    const r = bulkRows[Number(row.dataset.row)];
+    r[e.target.dataset.field] = e.target.value;
+    if (e.target.dataset.field === "date") { r.dateFrom = "manual"; row.querySelector(".bulk-src").textContent = ""; }
+  }
+});
+// Tapping outside a sheet closes it, except bulk entry where that would lose typed rows.
+document.querySelectorAll("dialog").forEach(d => d.addEventListener("click", e => { if (e.target === d && d.id !== "bulkDlg") d.close(); }));
+$("#detailDlg").addEventListener("close", () => fullUrls.splice(0).forEach(u => URL.revokeObjectURL(u)));
+
+async function loadAll() {
+  thumbUrls.forEach(u => URL.revokeObjectURL(u)); thumbUrls.clear();
+  projects = await getAll("projects");
+  photos = await getAll("photos");
+}
+
+(async () => {
+  db = await openDB();
+  await loadAll();
+  render();
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+</body>
+</html>
