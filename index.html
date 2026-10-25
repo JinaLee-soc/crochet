@@ -143,16 +143,18 @@ textarea.input { min-height: 64px; resize: vertical; }
 .photos { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 16px -16px 0; padding: 0 16px; }
 .photos .p { flex: none; width: 84%; max-width: 420px; scroll-snap-align: center; position: relative; }
 .photos img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 2px; display: block; background: var(--surface); }
-.photos .del {
-  position: absolute; top: 8px; right: 8px; min-height: 32px; padding: 0 10px;
-  background: var(--bg); color: var(--ink); font-size: 12px; border: 1px solid var(--line);
-}
+.ptools { display: flex; align-items: center; gap: 16px; }
+.ptools > :first-child { margin-right: auto; }
+.ptools .text-btn { min-height: 40px; font-size: 13px; }
+.cover-mark { font-size: 13px; color: var(--muted); }
 .add-photo {
   flex: none; width: 84%; max-width: 420px; aspect-ratio: 1; scroll-snap-align: center;
   border: 1px dashed var(--line); border-radius: 2px; color: var(--accent); font-size: 14px;
 }
 .pending-photos { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.pending-photos img { width: 64px; height: 64px; object-fit: cover; border-radius: 2px; }
+.pending-photos img, .pt img { width: 64px; height: 64px; object-fit: cover; border-radius: 2px; display: block; }
+.pt { display: flex; flex-direction: column; align-items: center; flex: none; }
+.pt .text-btn { min-height: 32px; font-size: 12px; padding: 0; }
 .facts { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--line); }
 .facts .dates { font-size: 12px; color: var(--muted); }
 .facts .note { font-size: 14px; color: var(--ink); margin-top: 4px; overflow-wrap: anywhere; }
@@ -172,7 +174,6 @@ textarea.input { min-height: 64px; resize: vertical; }
 .bulk-tools .btn { flex: 1; padding: 0 8px; }
 .bulk-row { padding: 16px 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
 .bulk-ph { display: flex; gap: 6px; overflow-x: auto; }
-.bulk-ph img { width: 64px; height: 64px; object-fit: cover; border-radius: 2px; flex: none; }
 .bulk-ph span { font-size: 12px; color: var(--muted); }
 .bulk-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
 .bulk-actions { display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
@@ -181,6 +182,11 @@ textarea.input { min-height: 64px; resize: vertical; }
 .bulk-actions .text-btn.remove { color: var(--muted); }
 .bulk-foot { position: sticky; bottom: calc(-20px - env(safe-area-inset-bottom)); background: var(--bg); padding: 12px 0 calc(20px + env(safe-area-inset-bottom)); margin-bottom: calc(-20px - env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
 .bulk-foot .btn { width: 100%; }
+.head-btns { display: flex; gap: 6px; }
+.head-btns .btn { padding: 0 12px; }
+.card-controls { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.card-preview { margin-top: 12px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; min-height: 240px; }
+.card-preview img { max-width: 100%; max-height: 56vh; display: block; }
 [hidden] { display: none !important; }
 </style>
 </head>
@@ -263,6 +269,9 @@ textarea.input { min-height: 64px; resize: vertical; }
       </div>
     </div>
     <div class="actions">
+      <button type="button" class="btn primary" id="detailCardBtn">자랑 카드 만들기</button>
+    </div>
+    <div class="sub-actions">
       <button type="button" class="btn" id="detailEditBtn">수정</button>
       <button type="button" class="btn" id="reopenBtn">진행 중으로</button>
       <button type="button" class="btn danger" id="detailDeleteBtn">삭제</button>
@@ -289,6 +298,31 @@ textarea.input { min-height: 64px; resize: vertical; }
     <div class="bulk-foot">
       <button type="button" class="btn primary" id="bulkSaveBtn">완성 목록에 추가</button>
     </div>
+  </form>
+</dialog>
+
+<!-- share cards -->
+<dialog id="cardDlg">
+  <form class="sheet" method="dialog">
+    <div class="sheet-head">
+      <h2 id="cardTitle">카드</h2>
+      <button type="button" class="text-btn" data-close>닫기</button>
+    </div>
+    <div class="card-controls" id="cardControls">
+      <div class="filters" id="cardYears"></div>
+      <div class="filters">
+        <button type="button" class="filter" data-kind="bars">월별 막대</button>
+        <button type="button" class="filter" data-kind="mosaic">모자이크</button>
+      </div>
+    </div>
+    <div class="card-preview">
+      <img id="cardImg" alt="카드 미리보기" hidden>
+      <p class="hint" id="cardWait">만드는 중…</p>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn primary" id="cardShareBtn" disabled>공유하기</button>
+    </div>
+    <p class="hint">공유 화면에서 '이미지 저장'을 누르면 사진 앱에 저장됩니다.</p>
   </form>
 </dialog>
 
@@ -383,6 +417,10 @@ function thumbUrl(ph) {
   if (!thumbUrls.has(ph.id)) thumbUrls.set(ph.id, URL.createObjectURL(ph.thumb));
   return thumbUrls.get(ph.id);
 }
+function coverOf(p) {
+  const ph = photosOf(p.id);
+  return ph.find(x => x.id === p.coverId) || ph[0] || null;
+}
 function photosOf(pid) {
   return photos.filter(p => p.projectId === pid).sort((a, b) => a.createdAt - b.createdAt);
 }
@@ -426,7 +464,8 @@ function renderActive() {
 
 function renderDone() {
   const done = projects.filter(p => p.status === "done");
-  const head = label => `<div class="list-head"><span class="count">${label}</span><button class="btn primary" id="bulkBtn">완성작 추가</button></div>`;
+  const head = label => `<div class="list-head"><span class="count">${label}</span><div class="head-btns">
+    ${done.length ? `<button class="btn" id="yearCardBtn">모아보기 카드</button>` : ""}<button class="btn primary" id="bulkBtn">완성작 추가</button></div></div>`;
   if (!done.length) {
     $("#doneView").innerHTML = `${head("완성한 작품 없음")}<p class="empty">진행 중인 작품을 '완성 처리'하거나, 이미 완성한 작품을 사진과 함께 한꺼번에 추가하세요.</p>`;
     return;
@@ -460,9 +499,9 @@ function renderDone() {
   const body = groups.length ? groups.map(g => `
     <div class="group-title">${g.key}</div>
     <div class="grid">${g.items.map(p => {
-      const ph = photosOf(p.id);
+      const ph = photosOf(p.id), cover = coverOf(p);
       return `<button class="tile" data-detail="${p.id}">
-        <div class="ph">${ph.length ? `<img src="${thumbUrl(ph[0])}" alt="" loading="lazy">` : "사진 없음"}
+        <div class="ph">${cover ? `<img src="${thumbUrl(cover)}" alt="" loading="lazy">` : "사진 없음"}
           ${ph.length > 1 ? `<span class="count">${ph.length}</span>` : ""}</div>
         <div class="name">${esc(p.name)}</div><div class="sub">${mmText(p.mm)} · ${fmtDate(p.doneAt)}</div>
       </button>`;
@@ -632,6 +671,56 @@ async function addPhotos(projectId, processed) {
   });
   for (const r of recs) photos.push({ id: r.id, projectId, createdAt: r.createdAt, thumb: r.thumb });
 }
+function blobImage(blob) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("이미지를 읽지 못했습니다")); };
+    img.src = url;
+  });
+}
+// Quarter turn clockwise, re-encoded as JPEG.
+async function rotateBlob(blob, quality) {
+  const img = await blobImage(blob);
+  const c = document.createElement("canvas");
+  c.width = img.naturalHeight; c.height = img.naturalWidth;
+  const ctx = c.getContext("2d");
+  ctx.translate(c.width, 0); ctx.rotate(Math.PI / 2); ctx.drawImage(img, 0, 0);
+  return new Promise(res => c.toBlob(res, "image/jpeg", quality));
+}
+async function rotatePending(x) {
+  busy(true);
+  try { x.full = await rotateBlob(x.full, 0.85); x.thumb = await rotateBlob(x.thumb, 0.8); } finally { busy(false); }
+}
+async function rotatePhoto(id) {
+  const rec = photos.find(x => x.id === id);
+  busy(true);
+  try {
+    const stored = await run(["fulls"], "readonly", tx => reqP(tx.objectStore("fulls").get(id)));
+    const thumb = await rotateBlob(rec.thumb, 0.8);
+    const full = stored ? await rotateBlob(stored.full, 0.85) : null;
+    await run(["photos", "fulls"], "readwrite", tx => {
+      tx.objectStore("photos").put({ id, projectId: rec.projectId, createdAt: rec.createdAt, thumb });
+      if (full) tx.objectStore("fulls").put({ id, full });
+    });
+    rec.thumb = thumb;
+    if (thumbUrls.has(id)) { URL.revokeObjectURL(thumbUrls.get(id)); thumbUrls.delete(id); }
+  } catch (e) {
+    toast("사진을 돌리지 못했습니다");
+  } finally { busy(false); }
+  await renderDetailPhotos();
+  render();
+}
+async function setCover(id) {
+  const p = { ...detailing, coverId: id, updatedAt: Date.now() };
+  await putProject(p);
+  upsertLocal(p);
+  detailing = p;
+  await renderDetailPhotos();
+  render();
+  toast("대표 사진으로 정했습니다");
+}
 let photoPickHandler = null;
 function pickPhotos(handler) {
   photoPickHandler = handler;
@@ -660,8 +749,13 @@ function openFinish(p) {
   $("#editDlg").close();
   $("#finishDlg").showModal();
 }
+const pendingUrls = [];
 function renderFinishPending() {
-  $("#finishPhotos").innerHTML = finishPending.map(x => `<img src="${URL.createObjectURL(x.thumb)}" alt="">`).join("");
+  pendingUrls.splice(0).forEach(u => URL.revokeObjectURL(u));
+  $("#finishPhotos").innerHTML = finishPending.map((x, i) => {
+    const u = URL.createObjectURL(x.thumb); pendingUrls.push(u);
+    return `<div class="pt"><img src="${u}" alt=""><button type="button" class="text-btn" data-rotpend="${i}">돌리기</button></div>`;
+  }).join("");
 }
 async function confirmFinish() {
   const p = { ...finishing, status: "done", doneAt: Date.now(), updatedAt: Date.now() };
@@ -698,7 +792,7 @@ function renderBulk() {
   const url = b => { const u = URL.createObjectURL(b); bulkUrls.push(u); return u; };
   $("#bulkRows").innerHTML = bulkRows.map((r, i) => `
     <div class="bulk-row" data-row="${i}">
-      <div class="bulk-ph">${r.photos.length ? r.photos.map(x => `<img src="${url(x.thumb)}" alt="">`).join("") : `<span>사진 없음</span>`}</div>
+      <div class="bulk-ph">${r.photos.length ? r.photos.map((x, j) => `<div class="pt"><img src="${url(x.thumb)}" alt=""><button type="button" class="text-btn" data-rotbulk="${i}:${j}">돌리기</button></div>`).join("") : `<span>사진 없음</span>`}</div>
       <input class="input" data-field="name" placeholder="작품 이름" value="${esc(r.name)}" maxlength="60" autocomplete="off">
       <div class="bulk-pair">
         <input class="input" data-field="mm" inputmode="decimal" placeholder="호수 mm (모르면 비움)" value="${esc(r.mm)}">
@@ -785,12 +879,17 @@ async function openDetail(p) {
 }
 async function renderDetailPhotos() {
   fullUrls.splice(0).forEach(u => URL.revokeObjectURL(u));
-  const ph = photosOf(detailing.id);
+  const ph = photosOf(detailing.id), cover = coverOf(detailing);
   const fulls = await run(["fulls"], "readonly", tx => Promise.all(ph.map(x => reqP(tx.objectStore("fulls").get(x.id)))));
   $("#detailPhotos").innerHTML = ph.map((x, i) => {
     const blob = fulls[i] ? fulls[i].full : x.thumb;
     const u = URL.createObjectURL(blob); fullUrls.push(u);
-    return `<div class="p"><img src="${u}" alt=""><button type="button" class="del" data-delphoto="${x.id}" >삭제</button></div>`;
+    return `<div class="p"><img src="${u}" alt="">
+      <div class="ptools">
+        ${x.id === cover.id ? `<span class="cover-mark">대표 사진</span>` : `<button type="button" class="text-btn" data-cover="${x.id}">대표로</button>`}
+        <button type="button" class="text-btn" data-rotate="${x.id}">돌리기</button>
+        <button type="button" class="text-btn" data-delphoto="${x.id}">삭제</button>
+      </div></div>`;
   }).join("") + `<button type="button" class="add-photo" id="detailAddPhoto">사진 추가</button>`;
 }
 async function deletePhoto(id) {
@@ -800,6 +899,172 @@ async function deletePhoto(id) {
   if (thumbUrls.has(id)) { URL.revokeObjectURL(thumbUrls.get(id)); thumbUrls.delete(id); }
   await renderDetailPhotos();
   render();
+}
+
+/* ---------- share cards (drawn on canvas at 1080px wide) ---------- */
+const CARD_FONT = '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif';
+const C_INK = "#333330", C_MUTED = "#6b6a64", C_LINE = "#d7d6d0", C_SURFACE = "#e9e8e4";
+function cardCanvas(w, h) {
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
+  return [c, ctx];
+}
+const cardFont = (ctx, size, weight = 400) => { ctx.font = `${weight} ${size}px ${CARD_FONT}`; };
+function cardText(ctx, str, x, y, size, { weight = 400, color = C_INK, align = "left" } = {}) {
+  cardFont(ctx, size, weight); ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(str, x, y);
+}
+const cardRule = (ctx, x1, y, x2) => { ctx.fillStyle = C_LINE; ctx.fillRect(x1, y, x2 - x1, 2); };
+// Fill the box with the image, cropping the overflow (object-fit: cover).
+function drawCover(ctx, img, x, y, w, h) {
+  ctx.fillStyle = C_SURFACE; ctx.fillRect(x, y, w, h);
+  if (!img) return;
+  const k = Math.max(w / img.naturalWidth, h / img.naturalHeight), sw = w / k, sh = h / k;
+  ctx.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) / 2, sw, sh, x, y, w, h);
+}
+function wrapLines(ctx, str, maxW, maxLines) {
+  const lines = [];
+  let cur = "";
+  for (const word of str.split(/(\s+)/)) {
+    if (ctx.measureText(cur + word).width <= maxW) { cur += word; continue; }
+    if (cur.trim()) lines.push(cur.trim());
+    cur = word.trimStart();
+    while (ctx.measureText(cur).width > maxW) {           // one word wider than the line
+      let cut = cur.length;
+      while (cut > 1 && ctx.measureText(cur.slice(0, cut)).width > maxW) cut--;
+      lines.push(cur.slice(0, cut)); cur = cur.slice(cut);
+    }
+  }
+  if (cur.trim()) lines.push(cur.trim());
+  if (lines.length > maxLines) {
+    lines.length = maxLines;
+    let last = lines[maxLines - 1];
+    while (last && ctx.measureText(last + "…").width > maxW) last = last.slice(0, -1);
+    lines[maxLines - 1] = last + "…";
+  }
+  return lines;
+}
+async function coverFull(p) {
+  const cover = coverOf(p);
+  if (!cover) return null;
+  const stored = await run(["fulls"], "readonly", tx => reqP(tx.objectStore("fulls").get(cover.id)));
+  return blobImage(stored ? stored.full : cover.thumb).catch(() => null);
+}
+const coverThumbs = list => Promise.all(list.map(p => { const c = coverOf(p); return c ? blobImage(c.thumb).catch(() => null) : null; }));
+
+async function drawWorkCard(p) {
+  const [c, ctx] = cardCanvas(1080, 1920);
+  drawCover(ctx, await coverFull(p), 80, 96, 920, 1180);
+  cardFont(ctx, 64, 500);
+  let y = 1388;
+  for (const line of wrapLines(ctx, p.name, 920, 2)) { cardText(ctx, line, 80, y, 64, { weight: 500 }); y += 78; }
+  y += -78 + 46;
+  cardRule(ctx, 80, y, 1000);
+  const rows = [["코바늘", mmText(p.mm)], ["완성", fmtDate(p.doneAt)]];
+  if (!p.startUnknown) rows.push(["걸린 기간", `${Math.max(1, Math.round((p.doneAt - p.createdAt) / 86400000))}일`]);
+  for (const [label, value] of rows) {
+    cardText(ctx, label, 80, y + 54, 26, { color: C_MUTED });
+    cardText(ctx, value, 1000, y + 57, 38, { color: label === "코바늘" && p.mm == null ? C_MUTED : C_INK, align: "right" });
+    y += 86;
+    cardRule(ctx, 80, y, 1000);
+  }
+  cardText(ctx, `${new Date(p.doneAt).getFullYear()}년 완성작`, 80, 1840, 22, { color: C_MUTED });
+  cardText(ctx, "뜨개 기록", 1000, 1840, 22, { color: C_MUTED, align: "right" });
+  return c;
+}
+const yearWorks = year => projects
+  .filter(p => p.status === "done" && new Date(p.doneAt).getFullYear() === year)
+  .sort((a, b) => a.doneAt - b.doneAt);
+const byMonth = list => Array.from({ length: 12 }, (_, m) => list.filter(p => new Date(p.doneAt).getMonth() === m));
+// Returns the y of the rule under the header.
+function drawYearHead(ctx, x, top, year, sub) {
+  cardText(ctx, "뜨개 기록", x, top + 24, 24, { color: C_MUTED });
+  cardText(ctx, String(year), x - 4, top + 132, 112, { weight: 500 });
+  cardText(ctx, sub, x, top + 188, 30);
+  return top + 224;
+}
+async function drawBarsCard(year) {
+  const list = yearWorks(year), months = byMonth(list);
+  const [c, ctx] = cardCanvas(1080, 1920);
+  let y = drawYearHead(ctx, 80, 96, year, `완성작 ${list.length}개`) + 8;
+  cardRule(ctx, 80, y, 1000);
+  const shown = months.flatMap(l => l.slice(0, 8));
+  const imgs = new Map((await coverThumbs(shown)).map((img, i) => [shown[i].id, img]));
+  const ROW = 112, T = 80;
+  months.forEach((l, m) => {
+    const mid = y + ROW / 2;
+    cardText(ctx, `${m + 1}월`, 80, mid + 10, 28);
+    cardText(ctx, String(l.length), 222, mid + 10, 28, { color: C_MUTED, align: "right" });
+    l.slice(0, 8).forEach((p, i) => drawCover(ctx, imgs.get(p.id), 258 + i * (T + 4), mid - T / 2, T, T));
+    if (l.length > 8) cardText(ctx, `+${l.length - 8}`, 258 + 8 * (T + 4) + 6, mid + 8, 22, { color: C_MUTED });
+    y += ROW;
+    cardRule(ctx, 80, y, 1000);
+  });
+  cardText(ctx, "월별 완성작", 80, 1840, 22, { color: C_MUTED });
+  cardText(ctx, "뜨개 기록", 1000, 1840, 22, { color: C_MUTED, align: "right" });
+  return c;
+}
+async function drawMosaicCard(year) {
+  const list = yearWorks(year), counts = byMonth(list).map(l => l.length);
+  const top = counts.indexOf(Math.max(...counts));
+  const [c, ctx] = cardCanvas(1080, 1350);
+  let y = drawYearHead(ctx, 64, 64, year, `완성작 ${list.length}개 · 가장 많이 뜬 달 ${top + 1}월 (${counts[top]}개)`);
+  cardRule(ctx, 64, y, 1016);
+  y += 28;
+  // Fewest columns whose square tiles still fit the space under the header.
+  const W = 952, H = 1350 - 64 - y, GAP = 4;
+  let cols = 4;
+  while (Math.ceil(list.length / cols) * (W / cols) > H) cols++;
+  const size = (W - GAP * (cols - 1)) / cols;
+  const imgs = await coverThumbs(list);
+  list.forEach((p, i) => drawCover(ctx, imgs[i], 64 + (i % cols) * (size + GAP), y + Math.floor(i / cols) * (size + GAP), size, size));
+  return c;
+}
+
+let cardMode = null, cardFile = null, cardUrl = null, cardToken = 0;
+function openCard(mode) {
+  cardMode = mode;
+  const yearly = mode.kind !== "work";
+  $("#cardTitle").textContent = yearly ? "모아보기 카드" : "자랑 카드";
+  $("#cardControls").hidden = !yearly;
+  $("#cardDlg").showModal();
+  renderCard();
+}
+async function renderCard() {
+  const token = ++cardToken;
+  if (cardMode.kind !== "work") {
+    const years = [...new Set(projects.filter(p => p.status === "done").map(p => new Date(p.doneAt).getFullYear()))].sort((a, b) => b - a);
+    $("#cardYears").innerHTML = years.map(y => `<button type="button" class="filter" data-cardyear="${y}" aria-pressed="${y === cardMode.year}">${y}</button>`).join("");
+    document.querySelectorAll("[data-kind]").forEach(b => b.setAttribute("aria-pressed", b.dataset.kind === cardMode.kind));
+  }
+  $("#cardImg").hidden = true; $("#cardWait").hidden = false; $("#cardWait").textContent = "만드는 중…";
+  $("#cardShareBtn").disabled = true;
+  try {
+    const m = cardMode;
+    const canvas = m.kind === "work" ? await drawWorkCard(m.p) : m.kind === "bars" ? await drawBarsCard(m.year) : await drawMosaicCard(m.year);
+    const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.92));
+    if (token !== cardToken) return;              // a newer request replaced this one
+    const name = m.kind === "work" ? `뜨개-${m.p.name}.jpg` : `뜨개-${m.year}-${m.kind === "bars" ? "월별" : "모자이크"}.jpg`;
+    cardFile = new File([blob], name.replace(/[\\/:*?"<>|]/g, ""), { type: "image/jpeg" });
+    if (cardUrl) URL.revokeObjectURL(cardUrl);
+    cardUrl = URL.createObjectURL(blob);
+    $("#cardImg").src = cardUrl;
+    $("#cardImg").hidden = false; $("#cardWait").hidden = true;
+    $("#cardShareBtn").disabled = false;
+  } catch (e) {
+    if (token === cardToken) $("#cardWait").textContent = "카드를 만들지 못했습니다";
+  }
+}
+async function shareCard() {
+  if (!cardFile) return;
+  if (navigator.canShare && navigator.canShare({ files: [cardFile] })) {
+    try { await navigator.share({ files: [cardFile] }); }
+    catch (e) { if (e.name !== "AbortError") toast("공유하지 못했습니다"); }
+  } else {
+    const a = document.createElement("a");
+    a.href = cardUrl; a.download = cardFile.name; a.click();
+  }
 }
 
 /* ---------- backup ---------- */
@@ -885,6 +1150,21 @@ document.addEventListener("click", e => {
   if (t.dataset.remove) { bulkRows.splice(Number(t.dataset.remove), 1); renderBulk(); return; }
   if (t.id === "bulkBtn") { openBulk(); return; }
   if (t.dataset.delphoto) { deletePhoto(t.dataset.delphoto); return; }
+  if (t.dataset.cover) { setCover(t.dataset.cover); return; }
+  if (t.dataset.rotate) { rotatePhoto(t.dataset.rotate); return; }
+  if (t.dataset.rotpend) { rotatePending(finishPending[Number(t.dataset.rotpend)]).then(renderFinishPending); return; }
+  if (t.dataset.rotbulk) {
+    const [r, j] = t.dataset.rotbulk.split(":").map(Number);
+    rotatePending(bulkRows[r].photos[j]).then(renderBulk);
+    return;
+  }
+  if (t.dataset.cardyear) { cardMode.year = Number(t.dataset.cardyear); renderCard(); return; }
+  if (t.dataset.kind) { cardMode.kind = t.dataset.kind; renderCard(); return; }
+  if (t.id === "yearCardBtn") {
+    const years = projects.filter(p => p.status === "done").map(p => new Date(p.doneAt).getFullYear());
+    openCard({ kind: "bars", year: Math.max(...years) });
+    return;
+  }
   if (t.id === "addBtn") { openEdit(null); return; }
   if (t.id === "detailAddPhoto") {
     pickPhotos(async out => { await addPhotos(detailing.id, out); await renderDetailPhotos(); render(); toast("사진을 추가했습니다"); });
@@ -904,6 +1184,9 @@ $("#reopenBtn").onclick = async () => {
   await putProject(p); upsertLocal(p);
   $("#detailDlg").close(); tab = "active"; render(); toast("진행 중으로 옮겼습니다");
 };
+$("#detailCardBtn").onclick = () => openCard({ kind: "work", p: detailing });
+$("#cardShareBtn").onclick = shareCard;
+$("#cardDlg").addEventListener("close", () => { cardToken++; if (cardUrl) { URL.revokeObjectURL(cardUrl); cardUrl = null; } cardFile = null; });
 $("#detailEditBtn").onclick = () => { const p = detailing; $("#detailDlg").close(); openEdit(p); };
 $("#bulkPhotosBtn").onclick = () => pickPhotos(out => {
   // Oldest first so photos of the same work sit next to each other; undated photos go last.

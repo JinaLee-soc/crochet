@@ -1,5 +1,5 @@
 // Bump CACHE when shipping changes so phones pick up the new version.
-const CACHE = "knit-log-v4";
+const CACHE = "knit-log-v5";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
