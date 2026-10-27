@@ -16,7 +16,7 @@ Keep a backup before clearing browser data or changing devices. Browser storage 
 
 ## Korean and English
 
-Choose **한국어** or **English** at the top of the app. The first visit uses your browser language: Korean for Korean browsers, English otherwise. Your choice is remembered when browser storage is available.
+Use the **국문 ↔ ENG** button at the top of the app to switch languages. The first visit uses your browser language: Korean for Korean browsers, English otherwise. Your choice is remembered when browser storage is available.
 
 The interface, messages, dates and generated card labels follow that choice. Project names and notes remain exactly as you entered them. Changing language does not move, translate or delete your records or photos.
 

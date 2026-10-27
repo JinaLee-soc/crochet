@@ -189,14 +189,14 @@ textarea.input { min-height: 64px; resize: vertical; }
 .card-preview { margin-top: 12px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; min-height: 240px; }
 .card-preview img { max-width: 100%; max-height: 56vh; display: block; }
 [hidden] { display: none !important; }
-.title-row{gap:12px}.title-row h1{margin-right:auto}.language-label select{font:inherit;color:var(--ink);background:white;border:1px solid var(--line);padding:6px;border-radius:2px;max-width:110px}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.title-row{gap:12px}.title-row h1{margin-right:auto}.language-toggle{font:inherit;font-size:13px;color:var(--ink);background:white;border:1px solid var(--line);padding:8px;border-radius:2px;white-space:nowrap;cursor:pointer}.language-toggle:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 </style>
 </head>
 <body>
 <header>
   <div class="title-row">
     <h1 data-i18n="뜨개 기록">뜨개 기록</h1>
-    <label class="language-label"><span class="sr-only">한국어 / English</span><select id="languageSelect" aria-label="한국어 / English"><option value="ko">한국어</option><option value="en">English</option></select></label>
+    <button type="button" class="language-toggle" id="languageToggle" aria-label="Switch to English">국문 ↔ ENG</button>
     <button class="text-btn" id="settingsBtn" data-i18n="백업">백업</button>
   </div>
   <div class="tabs" role="tablist">
@@ -354,8 +354,18 @@ textarea.input { min-height: 64px; resize: vertical; }
 "use strict";
 const {t, locale, applyLanguage, setLanguage} = window.CrochetI18n;
 applyLanguage();
-document.getElementById("languageSelect").value = window.CrochetI18n.language;
-document.getElementById("languageSelect").addEventListener("change", e => { setLanguage(e.target.value); applyLanguage(); document.getElementById("toast").classList.remove("show"); render(); });
+const languageToggle = document.getElementById("languageToggle");
+function updateLanguageToggle() {
+  languageToggle.setAttribute("aria-label", window.CrochetI18n.language === "ko" ? "Switch to English" : "한국어로 전환");
+}
+updateLanguageToggle();
+languageToggle.addEventListener("click", () => {
+  setLanguage(window.CrochetI18n.language === "ko" ? "en" : "ko");
+  applyLanguage();
+  updateLanguageToggle();
+  document.getElementById("toast").classList.remove("show");
+  render();
+});
 
 const MM_PRESETS = [2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0];
 const FULL_MAX = 1600, THUMB_MAX = 480;
