@@ -196,7 +196,7 @@ textarea.input { min-height: 64px; resize: vertical; }
 <header>
   <div class="title-row">
     <h1 data-i18n="뜨개 기록">뜨개 기록</h1>
-    <button type="button" class="language-toggle" id="languageToggle" aria-label="Switch to English">국문 ↔ ENG</button>
+    <button type="button" class="language-toggle" id="languageToggle" aria-label="Switch to English">ENG</button>
     <button class="text-btn" id="settingsBtn" data-i18n="백업">백업</button>
   </div>
   <div class="tabs" role="tablist">
@@ -356,6 +356,7 @@ const {t, locale, applyLanguage, setLanguage} = window.CrochetI18n;
 applyLanguage();
 const languageToggle = document.getElementById("languageToggle");
 function updateLanguageToggle() {
+  languageToggle.textContent = window.CrochetI18n.language === "ko" ? "ENG" : "국문";
   languageToggle.setAttribute("aria-label", window.CrochetI18n.language === "ko" ? "Switch to English" : "한국어로 전환");
 }
 updateLanguageToggle();
