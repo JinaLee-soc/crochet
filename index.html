@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>뜨개 기록</title>
+<title data-i18n="뜨개 기록">뜨개 기록</title>
 <meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="뜨개 기록">
+<script src="i18n.js"></script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
@@ -188,17 +189,19 @@ textarea.input { min-height: 64px; resize: vertical; }
 .card-preview { margin-top: 12px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; min-height: 240px; }
 .card-preview img { max-width: 100%; max-height: 56vh; display: block; }
 [hidden] { display: none !important; }
+.title-row{gap:12px}.title-row h1{margin-right:auto}.language-label select{font:inherit;color:var(--ink);background:white;border:1px solid var(--line);padding:6px;border-radius:2px;max-width:110px}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 </style>
 </head>
 <body>
 <header>
   <div class="title-row">
-    <h1>뜨개 기록</h1>
-    <button class="text-btn" id="settingsBtn">백업</button>
+    <h1 data-i18n="뜨개 기록">뜨개 기록</h1>
+    <label class="language-label"><span class="sr-only">한국어 / English</span><select id="languageSelect" aria-label="한국어 / English"><option value="ko">한국어</option><option value="en">English</option></select></label>
+    <button class="text-btn" id="settingsBtn" data-i18n="백업">백업</button>
   </div>
   <div class="tabs" role="tablist">
-    <button role="tab" id="tabActive" aria-selected="true">진행 중</button>
-    <button role="tab" id="tabDone" aria-selected="false">완성</button>
+    <button role="tab" id="tabActive" aria-selected="true" data-i18n="진행 중">진행 중</button>
+    <button role="tab" id="tabDone" aria-selected="false" data-i18n="완성">완성</button>
   </div>
 </header>
 
@@ -211,27 +214,27 @@ textarea.input { min-height: 64px; resize: vertical; }
 <dialog id="editDlg">
   <form class="sheet" method="dialog" id="editForm">
     <div class="sheet-head">
-      <h2 id="editTitle">새 작품</h2>
-      <button type="button" class="text-btn" data-close>닫기</button>
+      <h2 id="editTitle" data-i18n="새 작품">새 작품</h2>
+      <button type="button" class="text-btn" data-close data-i18n="닫기">닫기</button>
     </div>
-    <label class="f" for="nameIn">작품 이름</label>
-    <input class="input" id="nameIn" placeholder="예: 하늘색 미니백" autocomplete="off" maxlength="60">
-    <label class="f">코바늘 호수</label>
+    <label class="f" for="nameIn" data-i18n="작품 이름">작품 이름</label>
+    <input class="input" id="nameIn" placeholder="예: 하늘색 미니백" data-i18n-placeholder="예: 하늘색 미니백" autocomplete="off" maxlength="60">
+    <label class="f" data-i18n="코바늘 호수">코바늘 호수</label>
     <div class="mm-grid" id="mmGrid"></div>
-    <input class="input mm-custom" id="mmCustom" inputmode="decimal" placeholder="목록에 없으면 직접 입력 (예: 3.75)">
-    <p class="hint" id="mmOptionalHint" hidden>완성작은 호수를 비워둘 수 있습니다. 선택한 호수를 다시 누르면 해제됩니다.</p>
+    <input class="input mm-custom" id="mmCustom" inputmode="decimal" placeholder="목록에 없으면 직접 입력 (예: 3.75)" data-i18n-placeholder="목록에 없으면 직접 입력 (예: 3.75)">
+    <p class="hint" id="mmOptionalHint" hidden data-i18n="완성작은 호수를 비워둘 수 있습니다. 선택한 호수를 다시 누르면 해제됩니다.">완성작은 호수를 비워둘 수 있습니다. 선택한 호수를 다시 누르면 해제됩니다.</p>
     <div id="doneAtWrap" hidden>
-      <label class="f" for="doneAtIn">완성일</label>
+      <label class="f" for="doneAtIn" data-i18n="완성일">완성일</label>
       <input class="input" id="doneAtIn" type="date">
     </div>
-    <label class="f" for="noteIn">메모 (선택)</label>
-    <textarea class="input" id="noteIn" placeholder="예: 바닥 4mm, 몸통 5mm" maxlength="200"></textarea>
+    <label class="f" for="noteIn" data-i18n="메모 (선택)">메모 (선택)</label>
+    <textarea class="input" id="noteIn" placeholder="예: 바닥 4mm, 몸통 5mm" data-i18n-placeholder="예: 바닥 4mm, 몸통 5mm" maxlength="200"></textarea>
     <div class="actions">
-      <button type="button" class="btn primary" id="saveBtn">저장</button>
+      <button type="button" class="btn primary" id="saveBtn" data-i18n="저장">저장</button>
     </div>
     <div class="sub-actions" id="editExtra">
-      <button type="button" class="btn" id="finishBtn">완성 처리</button>
-      <button type="button" class="btn danger" id="deleteBtn">삭제</button>
+      <button type="button" class="btn" id="finishBtn" data-i18n="완성 처리">완성 처리</button>
+      <button type="button" class="btn danger" id="deleteBtn" data-i18n="삭제">삭제</button>
     </div>
   </form>
 </dialog>
@@ -240,15 +243,15 @@ textarea.input { min-height: 64px; resize: vertical; }
 <dialog id="finishDlg">
   <form class="sheet" method="dialog">
     <div class="sheet-head">
-      <h2>완성 처리</h2>
-      <button type="button" class="text-btn" data-close>닫기</button>
+      <h2 data-i18n="완성 처리">완성 처리</h2>
+      <button type="button" class="text-btn" data-close data-i18n="닫기">닫기</button>
     </div>
     <p class="lead" id="finishName"></p>
-    <label class="f">완성 사진 (선택)</label>
-    <button type="button" class="btn" id="finishPickBtn" style="width:100%">사진 찍기 또는 고르기</button>
+    <label class="f" data-i18n="완성 사진 (선택)">완성 사진 (선택)</label>
+    <button type="button" class="btn" id="finishPickBtn" style="width:100%" data-i18n="사진 찍기 또는 고르기">사진 찍기 또는 고르기</button>
     <div class="pending-photos" id="finishPhotos"></div>
     <div class="actions">
-      <button type="button" class="btn primary" id="finishConfirmBtn">완성 목록으로 옮기기</button>
+      <button type="button" class="btn primary" id="finishConfirmBtn" data-i18n="완성 목록으로 옮기기">완성 목록으로 옮기기</button>
     </div>
   </form>
 </dialog>
@@ -258,7 +261,7 @@ textarea.input { min-height: 64px; resize: vertical; }
   <form class="sheet" method="dialog">
     <div class="sheet-head">
       <h2 id="detailName"></h2>
-      <button type="button" class="text-btn" data-close>닫기</button>
+      <button type="button" class="text-btn" data-close data-i18n="닫기">닫기</button>
     </div>
     <div class="photos" id="detailPhotos"></div>
     <div class="facts">
@@ -269,12 +272,12 @@ textarea.input { min-height: 64px; resize: vertical; }
       </div>
     </div>
     <div class="actions">
-      <button type="button" class="btn primary" id="detailCardBtn">자랑 카드 만들기</button>
+      <button type="button" class="btn primary" id="detailCardBtn" data-i18n="자랑 카드 만들기">자랑 카드 만들기</button>
     </div>
     <div class="sub-actions">
-      <button type="button" class="btn" id="detailEditBtn">수정</button>
-      <button type="button" class="btn" id="reopenBtn">진행 중으로</button>
-      <button type="button" class="btn danger" id="detailDeleteBtn">삭제</button>
+      <button type="button" class="btn" id="detailEditBtn" data-i18n="수정">수정</button>
+      <button type="button" class="btn" id="reopenBtn" data-i18n="진행 중으로">진행 중으로</button>
+      <button type="button" class="btn danger" id="detailDeleteBtn" data-i18n="삭제">삭제</button>
     </div>
   </form>
 </dialog>
@@ -283,20 +286,20 @@ textarea.input { min-height: 64px; resize: vertical; }
 <dialog id="bulkDlg">
   <form class="sheet" method="dialog">
     <div class="sheet-head">
-      <h2>완성작 추가</h2>
-      <button type="button" class="text-btn" data-close>닫기</button>
+      <h2 data-i18n="완성작 추가">완성작 추가</h2>
+      <button type="button" class="text-btn" data-close data-i18n="닫기">닫기</button>
     </div>
-    <p class="hint">사진 한 장이 작품 하나가 되고, 찍은 날짜순으로 정렬됩니다. 같은 작품 사진은 '앞 작품에 합치기'로 묶으세요. 완성일은 사진 찍은 날로 채워집니다.</p>
-    <label class="f" for="bulkDate">기본 완성일 (사진 날짜가 없을 때)</label>
+    <p class="hint" data-i18n="사진 한 장이 작품 하나가 되고, 찍은 날짜순으로 정렬됩니다. 같은 작품 사진은 '앞 작품에 합치기'로 묶으세요. 완성일은 사진 찍은 날로 채워집니다.">사진 한 장이 작품 하나가 되고, 찍은 날짜순으로 정렬됩니다. 같은 작품 사진은 '앞 작품에 합치기'로 묶으세요. 완성일은 사진 찍은 날로 채워집니다.</p>
+    <label class="f" for="bulkDate" data-i18n="기본 완성일 (사진 날짜가 없을 때)">기본 완성일 (사진 날짜가 없을 때)</label>
     <input class="input" id="bulkDate" type="date">
     <div class="bulk-tools">
-      <button type="button" class="btn" id="bulkPhotosBtn">사진으로 추가</button>
-      <button type="button" class="btn" id="bulkRowBtn">사진 없이 추가</button>
+      <button type="button" class="btn" id="bulkPhotosBtn" data-i18n="사진으로 추가">사진으로 추가</button>
+      <button type="button" class="btn" id="bulkRowBtn" data-i18n="사진 없이 추가">사진 없이 추가</button>
     </div>
-    <p class="empty" id="bulkEmpty">추가할 작품이 없습니다.</p>
+    <p class="empty" id="bulkEmpty" data-i18n="추가할 작품이 없습니다.">추가할 작품이 없습니다.</p>
     <div id="bulkRows"></div>
     <div class="bulk-foot">
-      <button type="button" class="btn primary" id="bulkSaveBtn">완성 목록에 추가</button>
+      <button type="button" class="btn primary" id="bulkSaveBtn" data-i18n="완성 목록에 추가">완성 목록에 추가</button>
     </div>
   </form>
 </dialog>
@@ -305,24 +308,24 @@ textarea.input { min-height: 64px; resize: vertical; }
 <dialog id="cardDlg">
   <form class="sheet" method="dialog">
     <div class="sheet-head">
-      <h2 id="cardTitle">카드</h2>
-      <button type="button" class="text-btn" data-close>닫기</button>
+      <h2 id="cardTitle" data-i18n="카드">카드</h2>
+      <button type="button" class="text-btn" data-close data-i18n="닫기">닫기</button>
     </div>
     <div class="card-controls" id="cardControls">
       <div class="filters" id="cardYears"></div>
       <div class="filters">
-        <button type="button" class="filter" data-kind="bars">월별 막대</button>
-        <button type="button" class="filter" data-kind="mosaic">모자이크</button>
+        <button type="button" class="filter" data-kind="bars" data-i18n="월별 막대">월별 막대</button>
+        <button type="button" class="filter" data-kind="mosaic" data-i18n="모자이크">모자이크</button>
       </div>
     </div>
     <div class="card-preview">
-      <img id="cardImg" alt="카드 미리보기" hidden>
-      <p class="hint" id="cardWait">만드는 중…</p>
+      <img id="cardImg" alt="카드 미리보기" data-i18n-alt="카드 미리보기" hidden>
+      <p class="hint" id="cardWait" data-i18n="만드는 중…">만드는 중…</p>
     </div>
     <div class="actions">
-      <button type="button" class="btn primary" id="cardShareBtn" disabled>공유하기</button>
+      <button type="button" class="btn primary" id="cardShareBtn" disabled data-i18n="공유하기">공유하기</button>
     </div>
-    <p class="hint">공유 화면에서 '이미지 저장'을 누르면 사진 앱에 저장됩니다.</p>
+    <p class="hint" data-i18n="공유 화면에서 '이미지 저장'을 누르면 사진 앱에 저장됩니다.">공유 화면에서 '이미지 저장'을 누르면 사진 앱에 저장됩니다.</p>
   </form>
 </dialog>
 
@@ -330,13 +333,13 @@ textarea.input { min-height: 64px; resize: vertical; }
 <dialog id="backupDlg">
   <form class="sheet" method="dialog">
     <div class="sheet-head">
-      <h2>백업</h2>
-      <button type="button" class="text-btn" data-close>닫기</button>
+      <h2 data-i18n="백업">백업</h2>
+      <button type="button" class="text-btn" data-close data-i18n="닫기">닫기</button>
     </div>
-    <p class="lead">기록과 사진은 이 아이폰에만 저장됩니다. 백업 파일을 만들어 iCloud Drive에 보관하세요.</p>
+    <p class="lead" data-i18n="기록과 사진은 이 기기의 브라우저에 저장됩니다. 백업 파일을 만들어 iCloud Drive 등 안전한 곳에 보관하세요.">기록과 사진은 이 기기의 브라우저에 저장됩니다. 백업 파일을 만들어 iCloud Drive 등 안전한 곳에 보관하세요.</p>
     <div class="actions">
-      <button type="button" class="btn primary" id="exportBtn">백업 파일 만들기</button>
-      <button type="button" class="btn" id="importBtn">불러오기</button>
+      <button type="button" class="btn primary" id="exportBtn" data-i18n="백업 파일 만들기">백업 파일 만들기</button>
+      <button type="button" class="btn" id="importBtn" data-i18n="불러오기">불러오기</button>
     </div>
     <p class="hint" id="backupInfo"></p>
   </form>
@@ -345,10 +348,14 @@ textarea.input { min-height: 64px; resize: vertical; }
 <input type="file" id="photoInput" accept="image/*" multiple hidden>
 <input type="file" id="importInput" accept="application/json,.json" hidden>
 <div class="toast" id="toast"></div>
-<div class="busy" id="busy">처리 중…</div>
+<div class="busy" id="busy" data-i18n="처리 중…">처리 중…</div>
 
 <script>
 "use strict";
+const {t, locale, applyLanguage, setLanguage} = window.CrochetI18n;
+applyLanguage();
+document.getElementById("languageSelect").value = window.CrochetI18n.language;
+document.getElementById("languageSelect").addEventListener("change", e => { setLanguage(e.target.value); applyLanguage(); document.getElementById("toast").classList.remove("show"); render(); });
 
 const MM_PRESETS = [2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0];
 const FULL_MAX = 1600, THUMB_MAX = 480;
@@ -393,8 +400,8 @@ const $ = s => document.querySelector(s);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const fmtMm = n => { const s = Number(n).toFixed(2); return s.endsWith("0") ? s.slice(0, -1) : s; };
-const mmHtml = n => n == null ? `<span class="unknown">호수 모름</span>` : `${fmtMm(n)}<small>mm</small>`;
-const mmText = n => n == null ? "호수 모름" : `${fmtMm(n)}mm`;
+const mmHtml = n => n == null ? `<span class="unknown">${t("호수 모름")}</span>` : `${fmtMm(n)}<small>mm</small>`;
+const mmText = n => n == null ? t("호수 모름") : `${fmtMm(n)}mm`;
 const pad2 = n => String(n).padStart(2, "0");
 const toDateInput = t => { const d = new Date(t); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
 const fromDateInput = v => { const [y, m, d] = v.split("-").map(Number); return new Date(y, m - 1, d, 12).getTime(); };
@@ -404,14 +411,14 @@ function parseMm(v) {
   const n = parseFloat(v);
   return n > 0 && n < 40 ? Math.round(n * 100) / 100 : NaN;
 }
-const fmtDate = t => { const d = new Date(t); return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`; };
+const fmtDate = t => { const d = new Date(t); return d.toLocaleDateString(locale(),{year:'numeric',month:'short',day:'numeric'}); };
 
-function sinceText(t) {
-  const days = Math.floor((Date.now() - t) / 86400000);
-  if (days <= 0) return "오늘 수정";
-  if (days < 30) return `${days}일 전 수정`;
-  if (days < 365) return `${Math.floor(days / 30)}달 전 수정`;
-  return `${Math.floor(days / 365)}년 전 수정`;
+function sinceText(timestamp) {
+  const days = Math.floor((Date.now() - timestamp) / 86400000);
+  if (days <= 0) return t("오늘 수정");
+  if (days < 30) return t("{0}일 전 수정", days);
+  if (days < 365) return t("{0}달 전 수정", Math.floor(days / 30));
+  return t("{0}년 전 수정", Math.floor(days / 365));
 }
 function thumbUrl(ph) {
   if (!thumbUrls.has(ph.id)) thumbUrls.set(ph.id, URL.createObjectURL(ph.thumb));
@@ -443,15 +450,15 @@ function render() {
   tab === "active" ? renderActive() : renderDone();
 }
 
-const ADD_HEAD = label => `<div class="list-head"><span class="count">${label}</span><button class="btn primary" id="addBtn">작품 추가</button></div>`;
+const ADD_HEAD = label => `<div class="list-head"><span class="count">${label}</span><button class="btn primary" id="addBtn">${t("작품 추가")}</button></div>`;
 
 function renderActive() {
   const list = projects.filter(p => p.status === "active").sort((a, b) => b.updatedAt - a.updatedAt);
   if (!list.length) {
-    $("#activeView").innerHTML = `${ADD_HEAD("진행 중인 작품 없음")}<p class="empty">작품 이름과 코바늘 호수를 기록하세요.</p>`;
+    $("#activeView").innerHTML = `${ADD_HEAD(t("진행 중인 작품 없음"))}<p class="empty">${t("작품 이름과 코바늘 호수를 기록하세요.")}</p>`;
     return;
   }
-  $("#activeView").innerHTML = ADD_HEAD(`진행 중 ${list.length}개`) + `<div class="list">${list.map(p => `
+  $("#activeView").innerHTML = ADD_HEAD(t("진행 중 {0}개", list.length)) + `<div class="list">${list.map(p => `
     <button class="row-item" data-edit="${p.id}">
       <div class="mm-num">${mmHtml(p.mm)}</div>
       <div>
@@ -465,9 +472,9 @@ function renderActive() {
 function renderDone() {
   const done = projects.filter(p => p.status === "done");
   const head = label => `<div class="list-head"><span class="count">${label}</span><div class="head-btns">
-    ${done.length ? `<button class="btn" id="yearCardBtn">모아보기 카드</button>` : ""}<button class="btn primary" id="bulkBtn">완성작 추가</button></div></div>`;
+    ${done.length ? `<button class="btn" id="yearCardBtn">${t("모아보기 카드")}</button>` : ""}<button class="btn primary" id="bulkBtn">${t("완성작 추가")}</button></div></div>`;
   if (!done.length) {
-    $("#doneView").innerHTML = `${head("완성한 작품 없음")}<p class="empty">진행 중인 작품을 '완성 처리'하거나, 이미 완성한 작품을 사진과 함께 한꺼번에 추가하세요.</p>`;
+    $("#doneView").innerHTML = `${head(t("완성한 작품 없음"))}<p class="empty">${t("진행 중인 작품을 '완성 처리'하거나, 이미 완성한 작품을 사진과 함께 한꺼번에 추가하세요.")}</p>`;
     return;
   }
   const mms = [...new Set(done.map(p => p.mm).filter(m => m != null))].sort((a, b) => a - b);
@@ -482,18 +489,18 @@ function renderDone() {
   const groups = [];
   for (const p of shown) {
     const d = new Date(p.doneAt);
-    const key = `${d.getFullYear()}년 ${d.getMonth() + 1}월`;
+    const key = d.toLocaleDateString(locale(), {year:'numeric',month:'long'});
     if (!groups.length || groups[groups.length - 1].key !== key) groups.push({ key, items: [] });
     groups[groups.length - 1].items.push(p);
   }
 
-  const toolbar = head(`완성 ${done.length}개`) + `
+  const toolbar = head(t("완성 {0}개", done.length)) + `
     <div class="toolbar">
-      <input class="search" id="searchIn" type="search" placeholder="작품 이름 검색" value="${esc(galleryQuery)}">
+      <input class="search" id="searchIn" type="search" placeholder="${t("작품 이름 검색")}" value="${esc(galleryQuery)}">
       <div class="filters">
-        <button class="filter" data-mm="" aria-pressed="${galleryMm === null}">전체 ${done.length}</button>
+        <button class="filter" data-mm="" aria-pressed="${galleryMm === null}">${t("전체 {0}", done.length)}</button>
         ${mms.map(m => `<button class="filter" data-mm="${m}" aria-pressed="${galleryMm === m}">${fmtMm(m)}mm</button>`).join("")}
-        ${hasUnknown ? `<button class="filter" data-mm="none" aria-pressed="${galleryMm === "none"}">호수 모름</button>` : ""}
+        ${hasUnknown ? `<button class="filter" data-mm="none" aria-pressed="${galleryMm === "none"}">${t("호수 모름")}</button>` : ""}
       </div>
     </div>`;
   const body = groups.length ? groups.map(g => `
@@ -501,11 +508,11 @@ function renderDone() {
     <div class="grid">${g.items.map(p => {
       const ph = photosOf(p.id), cover = coverOf(p);
       return `<button class="tile" data-detail="${p.id}">
-        <div class="ph">${cover ? `<img src="${thumbUrl(cover)}" alt="" loading="lazy">` : "사진 없음"}
+        <div class="ph">${cover ? `<img src="${thumbUrl(cover)}" alt="" loading="lazy">` : t("사진 없음")}
           ${ph.length > 1 ? `<span class="count">${ph.length}</span>` : ""}</div>
         <div class="name">${esc(p.name)}</div><div class="sub">${mmText(p.mm)} · ${fmtDate(p.doneAt)}</div>
       </button>`;
-    }).join("")}</div>`).join("") : `<p class="empty">조건에 맞는 작품이 없습니다.</p>`;
+    }).join("")}</div>`).join("") : `<p class="empty">${t("조건에 맞는 작품이 없습니다.")}</p>`;
 
   const hadFocus = document.activeElement && document.activeElement.id === "searchIn";
   $("#doneView").innerHTML = toolbar + body;
@@ -521,7 +528,7 @@ function renderMmGrid() {
 }
 function openEdit(p) {
   editing = p || null;
-  $("#editTitle").textContent = p ? "작품 수정" : "새 작품";
+  $("#editTitle").textContent = p ? t("작품 수정") : t("새 작품");
   $("#nameIn").value = p ? p.name : "";
   $("#noteIn").value = p ? (p.note || "") : "";
   selectedMm = p ? p.mm : null;
@@ -543,11 +550,11 @@ function readMm() {
 async function saveEdit() {
   const name = $("#nameIn").value.trim();
   const mm = readMm();
-  if (!name) { toast("작품 이름을 입력하세요"); $("#nameIn").focus(); return; }
+  if (!name) { toast(t("작품 이름을 입력하세요")); $("#nameIn").focus(); return; }
   const isDone = !!editing && editing.status === "done";
-  if (mm === null && !isDone) { toast("코바늘 호수를 선택하세요"); return; }
-  if (isDone && !$("#doneAtIn").value) { toast("완성일을 입력하세요"); $("#doneAtIn").focus(); return; }
-  if (Number.isNaN(mm)) { toast("호수는 숫자로 입력하세요 (예: 3.75)"); $("#mmCustom").focus(); return; }
+  if (mm === null && !isDone) { toast(t("코바늘 호수를 선택하세요")); return; }
+  if (isDone && !$("#doneAtIn").value) { toast(t("완성일을 입력하세요")); $("#doneAtIn").focus(); return; }
+  if (Number.isNaN(mm)) { toast(t("호수는 숫자로 입력하세요 (예: 3.75)")); $("#mmCustom").focus(); return; }
   const now = Date.now();
   const p = editing
     ? { ...editing, name, mm, note: $("#noteIn").value.trim(), updatedAt: now }
@@ -561,7 +568,7 @@ async function saveEdit() {
   await putProject(saved);
   upsertLocal(saved);
   $("#editDlg").close();
-  toast(editing ? "수정했습니다" : `${name} · ${mmText(mm)} 기록했습니다`);
+  toast(editing ? t("수정했습니다") : t("{0} · {1} 기록했습니다", name, mmText(mm)));
   render();
 }
 function upsertLocal(p) {
@@ -569,7 +576,7 @@ function upsertLocal(p) {
   if (i >= 0) projects[i] = p; else projects.push(p);
 }
 async function deleteProject(p) {
-  if (!confirm(`'${p.name}'을(를) 삭제할까요? 사진도 함께 지워지며 되돌릴 수 없습니다.`)) return false;
+  if (!confirm(t("'{0}'을(를) 삭제할까요? 사진도 함께 지워지며 되돌릴 수 없습니다.", p.name))) return false;
   const ids = photosOf(p.id).map(x => x.id);
   await run(["projects", "photos", "fulls"], "readwrite", tx => {
     tx.objectStore("projects").delete(p.id);
@@ -578,7 +585,7 @@ async function deleteProject(p) {
   projects = projects.filter(x => x.id !== p.id);
   photos = photos.filter(x => x.projectId !== p.id);
   ids.forEach(id => { if (thumbUrls.has(id)) { URL.revokeObjectURL(thumbUrls.get(id)); thumbUrls.delete(id); } });
-  toast("삭제했습니다");
+  toast(t("삭제했습니다"));
   render();
   return true;
 }
@@ -589,7 +596,7 @@ function loadImage(file) {
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => resolve({ img, url });
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("이미지를 읽지 못했습니다")); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(t("이미지를 읽지 못했습니다"))); };
     img.src = url;
   });
 }
@@ -676,7 +683,7 @@ function blobImage(blob) {
     const url = URL.createObjectURL(blob);
     const img = new Image();
     img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("이미지를 읽지 못했습니다")); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(t("이미지를 읽지 못했습니다"))); };
     img.src = url;
   });
 }
@@ -707,7 +714,7 @@ async function rotatePhoto(id) {
     rec.thumb = thumb;
     if (thumbUrls.has(id)) { URL.revokeObjectURL(thumbUrls.get(id)); thumbUrls.delete(id); }
   } catch (e) {
-    toast("사진을 돌리지 못했습니다");
+    toast(t("사진을 돌리지 못했습니다"));
   } finally { busy(false); }
   await renderDetailPhotos();
   render();
@@ -719,7 +726,7 @@ async function setCover(id) {
   detailing = p;
   await renderDetailPhotos();
   render();
-  toast("대표 사진으로 정했습니다");
+  toast(t("대표 사진으로 정했습니다"));
 }
 let photoPickHandler = null;
 function pickPhotos(handler) {
@@ -754,7 +761,7 @@ function renderFinishPending() {
   pendingUrls.splice(0).forEach(u => URL.revokeObjectURL(u));
   $("#finishPhotos").innerHTML = finishPending.map((x, i) => {
     const u = URL.createObjectURL(x.thumb); pendingUrls.push(u);
-    return `<div class="pt"><img src="${u}" alt=""><button type="button" class="text-btn" data-rotpend="${i}">돌리기</button></div>`;
+    return `<div class="pt"><img src="${u}" alt=""><button type="button" class="text-btn" data-rotpend="${i}">${t("돌리기")}</button></div>`;
   }).join("");
 }
 async function confirmFinish() {
@@ -768,7 +775,7 @@ async function confirmFinish() {
   $("#finishDlg").close();
   tab = "done";
   render();
-  toast("완성 목록으로 옮겼습니다");
+  toast(t("완성 목록으로 옮겼습니다"));
 }
 
 /* ---------- bulk add finished ---------- */
@@ -792,21 +799,21 @@ function renderBulk() {
   const url = b => { const u = URL.createObjectURL(b); bulkUrls.push(u); return u; };
   $("#bulkRows").innerHTML = bulkRows.map((r, i) => `
     <div class="bulk-row" data-row="${i}">
-      <div class="bulk-ph">${r.photos.length ? r.photos.map((x, j) => `<div class="pt"><img src="${url(x.thumb)}" alt=""><button type="button" class="text-btn" data-rotbulk="${i}:${j}">돌리기</button></div>`).join("") : `<span>사진 없음</span>`}</div>
-      <input class="input" data-field="name" placeholder="작품 이름" value="${esc(r.name)}" maxlength="60" autocomplete="off">
+      <div class="bulk-ph">${r.photos.length ? r.photos.map((x, j) => `<div class="pt"><img src="${url(x.thumb)}" alt=""><button type="button" class="text-btn" data-rotbulk="${i}:${j}">${t("돌리기")}</button></div>`).join("") : `<span>${t("사진 없음")}</span>`}</div>
+      <input class="input" data-field="name" placeholder="${t("작품 이름")}" value="${esc(r.name)}" maxlength="60" autocomplete="off">
       <div class="bulk-pair">
-        <input class="input" data-field="mm" inputmode="decimal" placeholder="호수 mm (모르면 비움)" value="${esc(r.mm)}">
-        <input class="input" data-field="date" type="date" value="${esc(r.date)}" aria-label="완성일">
+        <input class="input" data-field="mm" inputmode="decimal" placeholder="${t("호수 mm (모르면 비움)")}" value="${esc(r.mm)}">
+        <input class="input" data-field="date" type="date" value="${esc(r.date)}" aria-label="${t("완성일")}">
       </div>
       <div class="bulk-actions">
-        <span class="bulk-src">${r.photos.length ? DATE_FROM[r.dateFrom] || "" : ""}</span>
-        ${i > 0 && r.photos.length ? `<button type="button" class="text-btn" data-merge="${i}">앞 작품에 합치기</button>` : ""}
-        <button type="button" class="text-btn remove" data-remove="${i}">빼기</button>
+        <span class="bulk-src">${r.photos.length ? t(DATE_FROM[r.dateFrom] || "") : ""}</span>
+        ${i > 0 && r.photos.length ? `<button type="button" class="text-btn" data-merge="${i}">${t("앞 작품에 합치기")}</button>` : ""}
+        <button type="button" class="text-btn remove" data-remove="${i}">${t("빼기")}</button>
       </div>
     </div>`).join("");
   $("#bulkEmpty").hidden = bulkRows.length > 0;
   $("#bulkSaveBtn").disabled = !bulkRows.length;
-  $("#bulkSaveBtn").textContent = bulkRows.length ? `${bulkRows.length}개 완성 목록에 추가` : "완성 목록에 추가";
+  $("#bulkSaveBtn").textContent = bulkRows.length ? t("{0}개 완성 목록에 추가", bulkRows.length) : t("완성 목록에 추가");
 }
 function mergeBulkRow(i) {
   const prev = bulkRows[i - 1], cur = bulkRows[i];
@@ -819,7 +826,7 @@ function mergeBulkRow(i) {
   renderBulk();
 }
 function closeBulk() {
-  if (bulkRows.length && !confirm("입력한 완성작을 저장하지 않고 닫을까요?")) return;
+  if (bulkRows.length && !confirm(t("입력한 완성작을 저장하지 않고 닫을까요?"))) return;
   bulkRows = [];
   $("#bulkDlg").close();
 }
@@ -827,9 +834,9 @@ async function saveBulk() {
   const field = (i, name) => $(`[data-row="${i}"] [data-field="${name}"]`);
   for (let i = 0; i < bulkRows.length; i++) {
     const r = bulkRows[i];
-    if (!r.name.trim()) { toast(`${i + 1}번째 작품 이름을 입력하세요`); field(i, "name").focus(); return; }
-    if (Number.isNaN(parseMm(r.mm))) { toast(`${i + 1}번째 호수는 숫자로 입력하세요`); field(i, "mm").focus(); return; }
-    if (!r.date) { toast(`${i + 1}번째 완성일을 입력하세요`); field(i, "date").focus(); return; }
+    if (!r.name.trim()) { toast(t("{0}번째 작품 이름을 입력하세요", i + 1)); field(i, "name").focus(); return; }
+    if (Number.isNaN(parseMm(r.mm))) { toast(t("{0}번째 호수는 숫자로 입력하세요", i + 1)); field(i, "mm").focus(); return; }
+    if (!r.date) { toast(t("{0}번째 완성일을 입력하세요", i + 1)); field(i, "date").focus(); return; }
   }
   const now = Date.now();
   const newProjects = [], newPhotos = [];
@@ -850,7 +857,7 @@ async function saveBulk() {
       }
     });
   } catch (e) {
-    toast("저장하지 못했습니다"); return;
+    toast(t("저장하지 못했습니다")); return;
   } finally { busy(false); }
   projects.push(...newProjects);
   for (const r of newPhotos) photos.push({ id: r.id, projectId: r.projectId, createdAt: r.createdAt, thumb: r.thumb });
@@ -858,7 +865,7 @@ async function saveBulk() {
   $("#bulkDlg").close();
   galleryMm = null; galleryQuery = "";
   render();
-  toast(`${newProjects.length}개를 완성 목록에 추가했습니다`);
+  toast(t("{0}개를 완성 목록에 추가했습니다", newProjects.length));
 }
 
 /* ---------- detail ---------- */
@@ -870,8 +877,8 @@ async function openDetail(p) {
   $("#detailMm").innerHTML = mmHtml(p.mm);
   const days = Math.max(1, Math.round((p.doneAt - p.createdAt) / 86400000));
   $("#detailFacts").textContent = p.startUnknown
-    ? `${fmtDate(p.doneAt)} 완성`
-    : `${fmtDate(p.createdAt)} 시작 · ${fmtDate(p.doneAt)} 완성 · ${days}일`;
+    ? t("{0} 완성", fmtDate(p.doneAt))
+    : t("{0} 시작 · {1} 완성 · {2}일", fmtDate(p.createdAt), fmtDate(p.doneAt), days);
   $("#detailNote").textContent = p.note || "";
   $("#detailNote").hidden = !p.note;
   await renderDetailPhotos();
@@ -886,14 +893,14 @@ async function renderDetailPhotos() {
     const u = URL.createObjectURL(blob); fullUrls.push(u);
     return `<div class="p"><img src="${u}" alt="">
       <div class="ptools">
-        ${x.id === cover.id ? `<span class="cover-mark">대표 사진</span>` : `<button type="button" class="text-btn" data-cover="${x.id}">대표로</button>`}
-        <button type="button" class="text-btn" data-rotate="${x.id}">돌리기</button>
-        <button type="button" class="text-btn" data-delphoto="${x.id}">삭제</button>
+        ${x.id === cover.id ? `<span class="cover-mark">${t("대표 사진")}</span>` : `<button type="button" class="text-btn" data-cover="${x.id}">${t("대표로")}</button>`}
+        <button type="button" class="text-btn" data-rotate="${x.id}">${t("돌리기")}</button>
+        <button type="button" class="text-btn" data-delphoto="${x.id}">${t("삭제")}</button>
       </div></div>`;
-  }).join("") + `<button type="button" class="add-photo" id="detailAddPhoto">사진 추가</button>`;
+  }).join("") + `<button type="button" class="add-photo" id="detailAddPhoto">${t("사진 추가")}</button>`;
 }
 async function deletePhoto(id) {
-  if (!confirm("이 사진을 지울까요?")) return;
+  if (!confirm(t("이 사진을 지울까요?"))) return;
   await run(["photos", "fulls"], "readwrite", tx => { tx.objectStore("photos").delete(id); tx.objectStore("fulls").delete(id); });
   photos = photos.filter(x => x.id !== id);
   if (thumbUrls.has(id)) { URL.revokeObjectURL(thumbUrls.get(id)); thumbUrls.delete(id); }
@@ -961,16 +968,16 @@ async function drawWorkCard(p) {
   for (const line of wrapLines(ctx, p.name, 920, 2)) { cardText(ctx, line, 80, y, 64, { weight: 500 }); y += 78; }
   y += -78 + 46;
   cardRule(ctx, 80, y, 1000);
-  const rows = [["코바늘", mmText(p.mm)], ["완성", fmtDate(p.doneAt)]];
-  if (!p.startUnknown) rows.push(["걸린 기간", `${Math.max(1, Math.round((p.doneAt - p.createdAt) / 86400000))}일`]);
+  const rows = [[t("코바늘"), mmText(p.mm)], [t("완성"), fmtDate(p.doneAt)]];
+  if (!p.startUnknown) rows.push([t("걸린 기간"), t("{0}일", Math.max(1, Math.round((p.doneAt - p.createdAt) / 86400000)))]);
   for (const [label, value] of rows) {
     cardText(ctx, label, 80, y + 54, 26, { color: C_MUTED });
-    cardText(ctx, value, 1000, y + 57, 38, { color: label === "코바늘" && p.mm == null ? C_MUTED : C_INK, align: "right" });
+    cardText(ctx, value, 1000, y + 57, 38, { color: label === t("코바늘") && p.mm == null ? C_MUTED : C_INK, align: "right" });
     y += 86;
     cardRule(ctx, 80, y, 1000);
   }
-  cardText(ctx, `${new Date(p.doneAt).getFullYear()}년 완성작`, 80, 1840, 22, { color: C_MUTED });
-  cardText(ctx, "뜨개 기록", 1000, 1840, 22, { color: C_MUTED, align: "right" });
+  cardText(ctx, t("{0}년 완성작", new Date(p.doneAt).getFullYear()), 80, 1840, 22, { color: C_MUTED });
+  cardText(ctx, t("뜨개 기록"), 1000, 1840, 22, { color: C_MUTED, align: "right" });
   return c;
 }
 const yearWorks = year => projects
@@ -979,7 +986,7 @@ const yearWorks = year => projects
 const byMonth = list => Array.from({ length: 12 }, (_, m) => list.filter(p => new Date(p.doneAt).getMonth() === m));
 // Returns the y of the rule under the header.
 function drawYearHead(ctx, x, top, year, sub) {
-  cardText(ctx, "뜨개 기록", x, top + 24, 24, { color: C_MUTED });
+  cardText(ctx, t("뜨개 기록"), x, top + 24, 24, { color: C_MUTED });
   cardText(ctx, String(year), x - 4, top + 132, 112, { weight: 500 });
   cardText(ctx, sub, x, top + 188, 30);
   return top + 224;
@@ -987,29 +994,29 @@ function drawYearHead(ctx, x, top, year, sub) {
 async function drawBarsCard(year) {
   const list = yearWorks(year), months = byMonth(list);
   const [c, ctx] = cardCanvas(1080, 1920);
-  let y = drawYearHead(ctx, 80, 96, year, `완성작 ${list.length}개`) + 8;
+  let y = drawYearHead(ctx, 80, 96, year, t("완성작 {0}개", list.length)) + 8;
   cardRule(ctx, 80, y, 1000);
   const shown = months.flatMap(l => l.slice(0, 8));
   const imgs = new Map((await coverThumbs(shown)).map((img, i) => [shown[i].id, img]));
   const ROW = 112, T = 80;
   months.forEach((l, m) => {
     const mid = y + ROW / 2;
-    cardText(ctx, `${m + 1}월`, 80, mid + 10, 28);
+    cardText(ctx, new Date(2000,m,1).toLocaleDateString(locale(),{month:'short'}), 80, mid + 10, 28);
     cardText(ctx, String(l.length), 222, mid + 10, 28, { color: C_MUTED, align: "right" });
     l.slice(0, 8).forEach((p, i) => drawCover(ctx, imgs.get(p.id), 258 + i * (T + 4), mid - T / 2, T, T));
     if (l.length > 8) cardText(ctx, `+${l.length - 8}`, 258 + 8 * (T + 4) + 6, mid + 8, 22, { color: C_MUTED });
     y += ROW;
     cardRule(ctx, 80, y, 1000);
   });
-  cardText(ctx, "월별 완성작", 80, 1840, 22, { color: C_MUTED });
-  cardText(ctx, "뜨개 기록", 1000, 1840, 22, { color: C_MUTED, align: "right" });
+  cardText(ctx, t("월별 완성작"), 80, 1840, 22, { color: C_MUTED });
+  cardText(ctx, t("뜨개 기록"), 1000, 1840, 22, { color: C_MUTED, align: "right" });
   return c;
 }
 async function drawMosaicCard(year) {
   const list = yearWorks(year), counts = byMonth(list).map(l => l.length);
   const top = counts.indexOf(Math.max(...counts));
   const [c, ctx] = cardCanvas(1080, 1350);
-  let y = drawYearHead(ctx, 64, 64, year, `완성작 ${list.length}개 · 가장 많이 뜬 달 ${top + 1}월 (${counts[top]}개)`);
+  let y = drawYearHead(ctx, 64, 64, year, t("완성작 {0}개 · 가장 많이 뜬 달 {1}월 ({2}개)", list.length, top + 1, counts[top]));
   cardRule(ctx, 64, y, 1016);
   y += 28;
   // Fewest columns whose square tiles still fit the space under the header.
@@ -1026,7 +1033,7 @@ let cardMode = null, cardFile = null, cardUrl = null, cardToken = 0;
 function openCard(mode) {
   cardMode = mode;
   const yearly = mode.kind !== "work";
-  $("#cardTitle").textContent = yearly ? "모아보기 카드" : "자랑 카드";
+  $("#cardTitle").textContent = yearly ? t("모아보기 카드") : t("자랑 카드");
   $("#cardControls").hidden = !yearly;
   $("#cardDlg").showModal();
   renderCard();
@@ -1038,14 +1045,14 @@ async function renderCard() {
     $("#cardYears").innerHTML = years.map(y => `<button type="button" class="filter" data-cardyear="${y}" aria-pressed="${y === cardMode.year}">${y}</button>`).join("");
     document.querySelectorAll("[data-kind]").forEach(b => b.setAttribute("aria-pressed", b.dataset.kind === cardMode.kind));
   }
-  $("#cardImg").hidden = true; $("#cardWait").hidden = false; $("#cardWait").textContent = "만드는 중…";
+  $("#cardImg").hidden = true; $("#cardWait").hidden = false; $("#cardWait").textContent = t("만드는 중…");
   $("#cardShareBtn").disabled = true;
   try {
     const m = cardMode;
     const canvas = m.kind === "work" ? await drawWorkCard(m.p) : m.kind === "bars" ? await drawBarsCard(m.year) : await drawMosaicCard(m.year);
     const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.92));
     if (token !== cardToken) return;              // a newer request replaced this one
-    const name = m.kind === "work" ? `뜨개-${m.p.name}.jpg` : `뜨개-${m.year}-${m.kind === "bars" ? "월별" : "모자이크"}.jpg`;
+    const name = m.kind === "work" ? `crochet-${m.p.name}.jpg` : `crochet-${m.year}-${m.kind}.jpg`;
     cardFile = new File([blob], name.replace(/[\\/:*?"<>|]/g, ""), { type: "image/jpeg" });
     if (cardUrl) URL.revokeObjectURL(cardUrl);
     cardUrl = URL.createObjectURL(blob);
@@ -1053,14 +1060,14 @@ async function renderCard() {
     $("#cardImg").hidden = false; $("#cardWait").hidden = true;
     $("#cardShareBtn").disabled = false;
   } catch (e) {
-    if (token === cardToken) $("#cardWait").textContent = "카드를 만들지 못했습니다";
+    if (token === cardToken) $("#cardWait").textContent = t("카드를 만들지 못했습니다");
   }
 }
 async function shareCard() {
   if (!cardFile) return;
   if (navigator.canShare && navigator.canShare({ files: [cardFile] })) {
     try { await navigator.share({ files: [cardFile] }); }
-    catch (e) { if (e.name !== "AbortError") toast("공유하지 못했습니다"); }
+    catch (e) { if (e.name !== "AbortError") toast(t("공유하지 못했습니다")); }
   } else {
     const a = document.createElement("a");
     a.href = cardUrl; a.download = cardFile.name; a.click();
@@ -1086,7 +1093,7 @@ async function exportBackup() {
     const name = `knit-log-backup-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}.json`;
     const file = new File([JSON.stringify(data)], name, { type: "application/json" });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: "뜨개 기록 백업" }); }
+      try { await navigator.share({ files: [file], title: t("뜨개 기록 백업") }); }
       catch (e) { if (e.name !== "AbortError") throw e; }
     } else {
       const a = document.createElement("a");
@@ -1094,15 +1101,15 @@ async function exportBackup() {
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
     }
   } catch (e) {
-    toast("백업 파일을 만들지 못했습니다");
+    toast(t("백업 파일을 만들지 못했습니다"));
   } finally { busy(false); }
 }
 async function importBackup(file) {
   let data;
-  try { data = JSON.parse(await file.text()); } catch { toast("백업 파일을 읽지 못했습니다"); return; }
-  if (data.app !== "knit-log" || !Array.isArray(data.projects)) { toast("뜨개 기록 백업 파일이 아닙니다"); return; }
+  try { data = JSON.parse(await file.text()); } catch { toast(t("백업 파일을 읽지 못했습니다")); return; }
+  if (data.app !== "knit-log" || !Array.isArray(data.projects)) { toast(t("뜨개 기록 백업 파일이 아닙니다")); return; }
   const n = data.projects.length, m = (data.photos || []).length;
-  if (!confirm(`작품 ${n}개, 사진 ${m}장을 불러올까요? 같은 작품은 백업 내용으로 덮어씁니다.`)) return;
+  if (!confirm(t("작품 {0}개, 사진 {1}장을 불러올까요? 같은 작품은 백업 내용으로 덮어씁니다.", n, m))) return;
   busy(true);
   try {
     const recs = [];
@@ -1120,54 +1127,54 @@ async function importBackup(file) {
     await loadAll();
     $("#backupDlg").close();
     render();
-    toast(`작품 ${n}개를 불러왔습니다`);
+    toast(t("작품 {0}개를 불러왔습니다", n));
   } catch (e) {
-    toast("불러오지 못했습니다");
+    toast(t("불러오지 못했습니다"));
   } finally { busy(false); }
 }
 
 /* ---------- wiring ---------- */
 document.addEventListener("click", e => {
-  const t = e.target.closest("button");
-  if (!t) return;
-  if (t.hasAttribute("data-close")) {
-    const d = t.closest("dialog");
+  const button = e.target.closest("button");
+  if (!button) return;
+  if (button.hasAttribute("data-close")) {
+    const d = button.closest("dialog");
     d.id === "bulkDlg" ? closeBulk() : d.close();
     return;
   }
-  if (t.dataset.edit) { openEdit(projects.find(p => p.id === t.dataset.edit)); return; }
-  if (t.dataset.detail) { openDetail(projects.find(p => p.id === t.dataset.detail)); return; }
-  if (t.dataset.pick) {
-    const v = Number(t.dataset.pick);
+  if (button.dataset.edit) { openEdit(projects.find(p => p.id === button.dataset.edit)); return; }
+  if (button.dataset.detail) { openDetail(projects.find(p => p.id === button.dataset.detail)); return; }
+  if (button.dataset.pick) {
+    const v = Number(button.dataset.pick);
     selectedMm = selectedMm === v && editing && editing.status === "done" ? null : v;
     $("#mmCustom").value = ""; renderMmGrid(); return;
   }
-  if ("mm" in t.dataset && t.classList.contains("filter")) {
-    const v = t.dataset.mm;
+  if ("mm" in button.dataset && button.classList.contains("filter")) {
+    const v = button.dataset.mm;
     galleryMm = v === "" ? null : v === "none" ? "none" : Number(v); renderDone(); return;
   }
-  if (t.dataset.merge) { mergeBulkRow(Number(t.dataset.merge)); return; }
-  if (t.dataset.remove) { bulkRows.splice(Number(t.dataset.remove), 1); renderBulk(); return; }
-  if (t.id === "bulkBtn") { openBulk(); return; }
-  if (t.dataset.delphoto) { deletePhoto(t.dataset.delphoto); return; }
-  if (t.dataset.cover) { setCover(t.dataset.cover); return; }
-  if (t.dataset.rotate) { rotatePhoto(t.dataset.rotate); return; }
-  if (t.dataset.rotpend) { rotatePending(finishPending[Number(t.dataset.rotpend)]).then(renderFinishPending); return; }
-  if (t.dataset.rotbulk) {
-    const [r, j] = t.dataset.rotbulk.split(":").map(Number);
+  if (button.dataset.merge) { mergeBulkRow(Number(button.dataset.merge)); return; }
+  if (button.dataset.remove) { bulkRows.splice(Number(button.dataset.remove), 1); renderBulk(); return; }
+  if (button.id === "bulkBtn") { openBulk(); return; }
+  if (button.dataset.delphoto) { deletePhoto(button.dataset.delphoto); return; }
+  if (button.dataset.cover) { setCover(button.dataset.cover); return; }
+  if (button.dataset.rotate) { rotatePhoto(button.dataset.rotate); return; }
+  if (button.dataset.rotpend) { rotatePending(finishPending[Number(button.dataset.rotpend)]).then(renderFinishPending); return; }
+  if (button.dataset.rotbulk) {
+    const [r, j] = button.dataset.rotbulk.split(":").map(Number);
     rotatePending(bulkRows[r].photos[j]).then(renderBulk);
     return;
   }
-  if (t.dataset.cardyear) { cardMode.year = Number(t.dataset.cardyear); renderCard(); return; }
-  if (t.dataset.kind) { cardMode.kind = t.dataset.kind; renderCard(); return; }
-  if (t.id === "yearCardBtn") {
+  if (button.dataset.cardyear) { cardMode.year = Number(button.dataset.cardyear); renderCard(); return; }
+  if (button.dataset.kind) { cardMode.kind = button.dataset.kind; renderCard(); return; }
+  if (button.id === "yearCardBtn") {
     const years = projects.filter(p => p.status === "done").map(p => new Date(p.doneAt).getFullYear());
     openCard({ kind: "bars", year: Math.max(...years) });
     return;
   }
-  if (t.id === "addBtn") { openEdit(null); return; }
-  if (t.id === "detailAddPhoto") {
-    pickPhotos(async out => { await addPhotos(detailing.id, out); await renderDetailPhotos(); render(); toast("사진을 추가했습니다"); });
+  if (button.id === "addBtn") { openEdit(null); return; }
+  if (button.id === "detailAddPhoto") {
+    pickPhotos(async out => { await addPhotos(detailing.id, out); await renderDetailPhotos(); render(); toast(t("사진을 추가했습니다")); });
   }
 });
 $("#tabActive").onclick = () => { tab = "active"; render(); };
@@ -1182,7 +1189,7 @@ $("#finishConfirmBtn").onclick = confirmFinish;
 $("#reopenBtn").onclick = async () => {
   const p = { ...detailing, status: "active", doneAt: null, updatedAt: Date.now() };
   await putProject(p); upsertLocal(p);
-  $("#detailDlg").close(); tab = "active"; render(); toast("진행 중으로 옮겼습니다");
+  $("#detailDlg").close(); tab = "active"; render(); toast(t("진행 중으로 옮겼습니다"));
 };
 $("#detailCardBtn").onclick = () => openCard({ kind: "work", p: detailing });
 $("#cardShareBtn").onclick = shareCard;
@@ -1209,7 +1216,7 @@ $("#bulkDlg").addEventListener("cancel", e => { e.preventDefault(); closeBulk();
 $("#detailDeleteBtn").onclick = async () => { if (await deleteProject(detailing)) $("#detailDlg").close(); };
 $("#settingsBtn").onclick = () => {
   const done = projects.filter(p => p.status === "done").length;
-  $("#backupInfo").textContent = `진행 중 ${projects.length - done}개 · 완성 ${done}개 · 사진 ${photos.length}장`;
+  $("#backupInfo").textContent = t("진행 중 {0}개 · 완성 {1}개 · 사진 {2}장", projects.length - done, done, photos.length);
   $("#backupDlg").showModal();
 };
 $("#exportBtn").onclick = exportBackup;

@@ -1,13 +1,13 @@
 // Bump CACHE when shipping changes so phones pick up the new version.
-const CACHE = "knit-log-v5";
-const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
+const CACHE = "knit-log-v6";
+const SHELL = ["./", "index.html", "manifest.webmanifest", "manifest.en.webmanifest", "i18n.js", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys()
-    .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    .then(keys => Promise.all(keys.filter(k => k.startsWith("knit-log-") && k !== CACHE).map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 // Network first so updates arrive when online; cache when offline.

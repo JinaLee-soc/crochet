@@ -1,7 +1,38 @@
-# 뜨개 기록
+# Knit/Crochet Log
 
-코바늘 작품마다 바늘 호수(mm)를 기록하고, 완성품을 사진과 함께 모아두는 아이폰용 웹앱.
+[한국어](README.ko.md) · [Open the app](https://jinalee-soc.github.io/crochet/)
 
-- 사용: 아이폰 Safari에서 이 저장소의 GitHub Pages 주소 열기 → 공유 → "홈 화면에 추가"
-- 데이터와 사진은 폰 안(IndexedDB)에만 저장됨. 오른쪽 위 버튼으로 백업 파일을 만들어 보관.
-- 앱을 고친 뒤에는 `sw.js`의 `CACHE` 버전을 올려야 폰에 새 버전이 반영됨.
+Track crochet projects, hook sizes and notes. Keep photos of finished work and create project cards or a year-in-review image.
+
+## Your records stay on your device
+
+GitHub Pages serves the app files. Your project records and photos are stored in **IndexedDB in your browser**, not in this repository or an application database on a server.
+
+Everyone can open the same address and keep their own collection. Other visitors cannot see your records through the app. No account or local server is required.
+
+Records do not automatically sync between devices or browsers. Use **Backup → Create backup file** to export records and photos. Use **Import** to restore them elsewhere. Matching projects are replaced by the imported backup.
+
+Keep a backup before clearing browser data or changing devices. Browser storage can be cleared or evicted. Private browsing may not retain it. Store backups somewhere safe, such as iCloud Drive. Sharing a card or backup sends that file to the destination you select.
+
+## Korean and English
+
+Choose **한국어** or **English** at the top of the app. The first visit uses your browser language: Korean for Korean browsers, English otherwise. Your choice is remembered when browser storage is available.
+
+The interface, messages, dates and generated card labels follow that choice. Project names and notes remain exactly as you entered them. Changing language does not move, translate or delete your records or photos.
+
+## Use it like an app
+
+On iPhone, open the site in Safari. Choose **Share → Add to Home Screen**. After the initial app files are cached, you can use the app offline. Open it online to receive updates.
+
+Select your preferred language before adding it to the home screen. An existing home-screen icon may keep its original name after you change the in-app language.
+
+## Development
+
+This is a static app. No build step or backend is required.
+
+```sh
+python3 -m http.server 8000
+node tests/i18n.test.cjs
+```
+
+Open `http://localhost:8000`. Translations are in `i18n.js`. Increment the cache version in `sw.js` when publishing changes. Keep new offline dependencies in its `SHELL` list. Both manifests use the same application identity and storage.
