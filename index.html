@@ -1032,12 +1032,12 @@ async function deletePhoto(id) {
 
 /* ---------- share cards (drawn on canvas at 1080px wide) ---------- */
 const CARD_FONT = '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif';
-const C_INK = "#333330", C_MUTED = "#69645b", C_LINE = "#d8d2c7", C_SURFACE = "#e9e5dd";
+const C_INK = "#212d2d", C_MUTED = "#53605d", C_LINE = "#303b3a", C_SURFACE = "#e9e7df";
 function cardCanvas(w, h) {
   const c = document.createElement("canvas");
   c.width = w; c.height = h;
   const ctx = c.getContext("2d");
-  ctx.fillStyle = "#f8f6f1"; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = "#f9f7f1"; ctx.fillRect(0, 0, w, h);
   return [c, ctx];
 }
 const cardFont = (ctx, size, weight = 400) => { ctx.font = `${weight} ${size}px ${CARD_FONT}`; };
@@ -1083,28 +1083,29 @@ async function coverFull(p) {
 const coverThumbs = list => Promise.all(list.map(p => { const c = coverOf(p); return c ? blobImage(c.thumb).catch(() => null) : null; }));
 
 async function drawWorkCard(p) {
-  const [c, ctx] = cardCanvas(1080, 1920);
-  cardText(ctx, p.example ? t("예시 작품") : t("뜨개 기록"), 80, 92, 27, { color: C_MUTED });
-  cardText(ctx, String(new Date(p.doneAt).getFullYear()), 1000, 92, 27, { color: C_MUTED, align: "right" });
-  drawCover(ctx, await coverFull(p), 80, 130, 920, 1060);
-  cardFont(ctx, 64, 500);
-  let y = 1290;
-  for (const line of wrapLines(ctx, displayField(p, "name"), 920, 2)) { cardText(ctx, line, 80, y, 64, { weight: 500 }); y += 78; }
-  y += 8;
-  cardRule(ctx, 80, y, 1000);
-  const rows = [[p.craft === "knitting" ? t("대바늘") : t("코바늘"), mmText(p.mm)], [t("완성"), fmtDate(p.doneAt)]];
-  if (p.yarn || p.color) rows.push([t("실 이름"), [displayField(p, "yarn"), displayField(p, "color")].filter(Boolean).join(" · ")]);
-  if (!p.startUnknown) rows.push([t("걸린 기간"), t("{0}일", Math.max(1, Math.round((p.doneAt - p.createdAt) / 86400000)))]);
-  for (const [label, value] of rows) {
-    cardText(ctx, label, 80, y + 48, 25, { color: C_MUTED });
-    cardFont(ctx, 32, 400);
-    const line = wrapLines(ctx, String(value), 650, 1)[0] || "";
-    cardText(ctx, line, 1000, y + 49, 32, { align: "right" });
-    y += 70;
-    cardRule(ctx, 80, y, 1000);
+  const [c, ctx] = cardCanvas(1080, 1440);
+  cardText(ctx, p.example ? t("예시 작품") : t("뜨개 기록"), 64, 76, 27, { weight: 500 });
+  cardText(ctx, String(new Date(p.doneAt).getFullYear()), 1016, 76, 27, { color: C_MUTED, align: "right" });
+  cardRule(ctx, 64, 108, 1016);
+  drawCover(ctx, await coverFull(p), 64, 142, 952, 714);
+  cardFont(ctx, 64, 400);
+  let y = 940;
+  for (const line of wrapLines(ctx, displayField(p, "name"), 952, 2)) { cardText(ctx, line, 64, y, 64); y += 72; }
+  cardRule(ctx, 64, y + 4, 1016);
+  const needle = `${p.craft === "knitting" ? t("대바늘") : t("코바늘")} ${mmText(p.mm)}`;
+  const materials = [displayField(p, "yarn"), displayField(p, "color")].filter(Boolean).join(" · ");
+  cardFont(ctx, 29);
+  const needleLine = wrapLines(ctx, needle, 410, 1)[0] || "";
+  const materialLine = wrapLines(ctx, materials, 475, 1)[0] || "";
+  cardText(ctx, needleLine, 64, y + 58, 29);
+  if (materialLine) cardText(ctx, materialLine, 1016, y + 58, 29, { align: "right" });
+  if (!p.startUnknown) {
+    const duration = t("{0}일", Math.max(1, Math.round((p.doneAt - p.createdAt) / 86400000)));
+    cardText(ctx, `${t("걸린 기간")} ${duration}`, 64, y + 112, 27, { color: C_MUTED });
   }
-  cardText(ctx, t("{0}년 완성작", new Date(p.doneAt).getFullYear()), 80, 1840, 24, { color: C_MUTED });
-  cardText(ctx, t("뜨개 기록"), 1000, 1840, 24, { color: C_MUTED, align: "right" });
+  cardRule(ctx, 64, 1320, 1016);
+  cardText(ctx, t("나의 완성작"), 64, 1372, 27, { color: C_MUTED });
+  cardText(ctx, fmtDate(p.doneAt), 1016, 1372, 27, { color: C_MUTED, align: "right" });
   return c;
 }
 const yearWorks = year => projects
@@ -1112,17 +1113,19 @@ const yearWorks = year => projects
   .sort((a, b) => a.doneAt - b.doneAt);
 const byMonth = list => Array.from({ length: 12 }, (_, m) => list.filter(p => new Date(p.doneAt).getMonth() === m));
 // Returns the y of the rule under the header.
-function drawYearHead(ctx, x, top, year, sub) {
-  cardText(ctx, t("뜨개 기록"), x, top + 24, 24, { color: C_MUTED });
-  ctx.font = '400 112px Georgia, serif'; ctx.fillStyle = C_INK; ctx.textAlign = "left"; ctx.fillText(String(year), x - 4, top + 132);
-  cardText(ctx, sub, x, top + 188, 27);
-  return top + 224;
+function drawYearHead(ctx, year) {
+  cardText(ctx, t("뜨개 기록"), 64, 76, 27, { weight: 500 });
+  cardText(ctx, "YEAR IN REVIEW", 1016, 76, 27, { color: C_MUTED, align: "right" });
+  cardRule(ctx, 64, 108, 1016);
+  ctx.font = '400 164px Georgia, serif'; ctx.fillStyle = C_INK; ctx.textAlign = "left"; ctx.fillText(String(year), 59, 300);
+  cardText(ctx, t("올해 만든 것들"), 64, 365, 46);
+  cardRule(ctx, 64, 402, 1016);
+  return 402;
 }
 async function drawBarsCard(year) {
   const list = yearWorks(year), months = byMonth(list);
   const [c, ctx] = cardCanvas(1080, 1920);
-  let y = drawYearHead(ctx, 80, 96, year, t("완성작 {0}개", list.length)) + 8;
-  cardRule(ctx, 80, y, 1000);
+  let y = drawYearHead(ctx, year) + 12;
   const shown = months.flatMap(l => l.slice(0, 8));
   const imgs = new Map((await coverThumbs(shown)).map((img, i) => [shown[i].id, img]));
   const ROW = 112, T = 76;
@@ -1135,25 +1138,35 @@ async function drawBarsCard(year) {
     y += ROW;
     cardRule(ctx, 80, y, 1000);
   });
-  cardText(ctx, t("월별 완성작"), 80, 1840, 22, { color: C_MUTED });
+  cardText(ctx, t("완성작 {0}개", list.length), 80, 1840, 22, { color: C_MUTED });
   cardText(ctx, list.some(p => p.example) ? t("예시 작품 포함") : t("뜨개 기록"), 1000, 1840, 22, { color: C_MUTED, align: "right" });
   return c;
 }
 async function drawMosaicCard(year) {
-  const list = yearWorks(year), counts = byMonth(list).map(l => l.length);
-  const top = counts.indexOf(Math.max(...counts));
-  const [c, ctx] = cardCanvas(1080, 1350);
-  let y = drawYearHead(ctx, 64, 64, year, t("완성작 {0}개 · 가장 많이 뜬 달 {1}월 ({2}개)", list.length, top + 1, counts[top]));
-  cardRule(ctx, 64, y, 1016);
-  y += 28;
-  // Fewest columns whose square tiles still fit the space under the header.
-  const W = 952, H = 1350 - 96 - y, GAP = 10;
-  let cols = list.length <= 1 ? 1 : list.length <= 4 ? 2 : 3;
-  while (Math.ceil(list.length / cols) * ((W - GAP * (cols - 1)) / cols + GAP) - GAP > H) cols++;
-  const size = (W - GAP * (cols - 1)) / cols;
+  const list = yearWorks(year);
+  const counts = byMonth(list).map(month => month.length);
+  const [c, ctx] = cardCanvas(1080, 1440);
+  const y = drawYearHead(ctx, year) + 40;
   const imgs = await coverThumbs(list);
-  list.forEach((p, i) => drawCover(ctx, imgs[i], 64 + (i % cols) * (size + GAP), y + Math.floor(i / cols) * (size + GAP), size, size));
-  cardText(ctx, list.some(p => p.example) ? t("예시 작품 포함") : t("뜨개 기록"), 1016, 1310, 23, { color: C_MUTED, align: "right" });
+  if (list.length === 1) {
+    drawCover(ctx, imgs[0], 64, y, 600, 600);
+  } else if (list.length === 2) {
+    drawCover(ctx, imgs[0], 64, y, 530, 530);
+    drawCover(ctx, imgs[1], 612, y + 126, 404, 404);
+  } else {
+    const width = 952, height = 1240 - y, gap = list.length > 2000 ? 0 : 10;
+    let cols = 2;
+    while (Math.ceil(list.length / cols) * ((width - gap * (cols - 1)) / cols + gap) - gap > height) cols++;
+    const size = (width - gap * (cols - 1)) / cols;
+    list.forEach((p, i) => drawCover(ctx, imgs[i], 64 + (i % cols) * (size + gap), y + Math.floor(i / cols) * (size + gap), size, size));
+  }
+  if (list.length) {
+    const top = counts.indexOf(Math.max(...counts));
+    cardText(ctx, t("가장 많이 뜬 달 {0}월 ({1}개)", top + 1, counts[top]), 64, 1280, 23, { color: C_MUTED });
+  }
+  cardRule(ctx, 64, 1320, 1016);
+  cardText(ctx, t("완성작 {0}개", list.length), 64, 1372, 27, { color: C_MUTED });
+  cardText(ctx, list.some(p => p.example) ? t("예시 작품 포함") : t("뜨개 기록"), 1016, 1372, 27, { color: C_MUTED, align: "right" });
   return c;
 }
 
@@ -1301,7 +1314,7 @@ document.addEventListener("click", e => {
   if (button.dataset.kind) { cardMode.kind = button.dataset.kind; renderCard(); return; }
   if (button.id === "yearCardBtn") {
     const years = projects.filter(p => p.status === "done").map(p => new Date(p.doneAt).getFullYear());
-    openCard({ kind: "bars", year: Math.max(...years) });
+    openCard({ kind: "mosaic", year: Math.max(...years) });
     return;
   }
   if (button.id === "addBtn") { openEdit(null); return; }
