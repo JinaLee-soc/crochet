@@ -21,7 +21,7 @@
   --surface: #e9e8e4;
   --remaining: #deddd7;
   --ink: #333330;
-  --muted: #6b6a64;
+  --muted: #62615b;
   --line: #d7d6d0;
   --accent: #41413d;
   --red: #a43e35;
@@ -35,9 +35,9 @@ body {
   min-height: 100vh;
 }
 h1, h2, p { margin: 0; }
-button, input, textarea { font: inherit; color: inherit; }
+button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; border: 0; border-radius: 2px; background: transparent; padding: 0; }
-button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .num { font-variant-numeric: tabular-nums; }
 
 header {
@@ -80,6 +80,8 @@ main { padding: 0 16px; max-width: 760px; margin: 0 auto; }
 .row-item .name { font-size: 16px; font-weight: 500; overflow-wrap: anywhere; }
 .row-item .note { font-size: 14px; color: var(--ink); margin-top: 2px; overflow-wrap: anywhere; }
 .row-item .since { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.row-item.has-thumb { grid-template-columns: 76px minmax(0, 1fr) 58px; }
+.row-item .example-thumb { width: 58px; height: 58px; object-fit: cover; border-radius: 6px; align-self: center; }
 
 /* gallery */
 .toolbar { padding: 16px 0 4px; display: flex; flex-direction: column; gap: 12px; }
@@ -106,6 +108,20 @@ main { padding: 0 16px; max-width: 760px; margin: 0 auto; }
 .tile .count { position: absolute; right: 6px; bottom: 6px; background: var(--bg); color: var(--ink); font-size: 11px; padding: 0 5px; border-radius: 2px; }
 .tile .name { font-size: 14px; font-weight: 500; margin-top: 6px; overflow-wrap: anywhere; }
 .tile .sub { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tile .ph { border-radius: 8px; background: #eeece6; }
+.tile .name { margin-top: 9px; font-size: 15px; }
+.tile .sub { margin-top: 2px; }
+.group-title { display: flex; align-items: baseline; justify-content: space-between; font-size: 15px; color: var(--ink); padding-top: 26px; }
+.group-title span { color: var(--muted); font-size: 12px; }
+.project-materials { display: grid; gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.project-materials div { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 10px; }
+.project-materials dt { color: var(--muted); font-size: 12px; }
+.project-materials dd { margin: 0; overflow-wrap: anywhere; }
+.project-materials a, .pattern-link { color: var(--ink); text-underline-offset: 3px; overflow-wrap: anywhere; }
+.pattern-link { display: inline-block; margin-top: 8px; }
+.example-notice { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; margin: 8px 0 4px; background: #f5f2ec; color: var(--ink); font-size: 13px; }
+.example-notice button { min-height: 36px; padding: 0 4px; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.example-label { display: inline-block; margin-left: 6px; padding: 1px 5px; border: 1px solid var(--line); color: var(--muted); font-size: 11px; font-weight: 400; vertical-align: 1px; }
 
 /* sheets */
 dialog {
@@ -217,12 +233,25 @@ textarea.input { min-height: 64px; resize: vertical; }
       <h2 id="editTitle" data-i18n="새 작품">새 작품</h2>
       <button type="button" class="text-btn" data-close data-i18n="닫기">닫기</button>
     </div>
+    <p class="hint" id="exampleEditHint" hidden data-i18n="예시를 수정해 저장하면 내 작품이 됩니다.">예시를 수정해 저장하면 내 작품이 됩니다.</p>
     <label class="f" for="nameIn" data-i18n="작품 이름">작품 이름</label>
     <input class="input" id="nameIn" placeholder="예: 하늘색 미니백" data-i18n-placeholder="예: 하늘색 미니백" autocomplete="off" maxlength="60">
-    <label class="f" data-i18n="코바늘 호수">코바늘 호수</label>
+    <label class="f" for="craftIn" data-i18n="바늘 종류">바늘 종류</label>
+    <select class="input" id="craftIn">
+      <option value="crochet" data-i18n="코바늘">코바늘</option>
+      <option value="knitting" data-i18n="대바늘">대바늘</option>
+    </select>
+    <label class="f" id="needleSizeLabel" data-i18n="코바늘 호수">코바늘 호수</label>
     <div class="mm-grid" id="mmGrid"></div>
     <input class="input mm-custom" id="mmCustom" inputmode="decimal" placeholder="목록에 없으면 직접 입력 (예: 3.75)" data-i18n-placeholder="목록에 없으면 직접 입력 (예: 3.75)">
     <p class="hint" id="mmOptionalHint" hidden data-i18n="완성작은 호수를 비워둘 수 있습니다. 선택한 호수를 다시 누르면 해제됩니다.">완성작은 호수를 비워둘 수 있습니다. 선택한 호수를 다시 누르면 해제됩니다.</p>
+    <label class="f" for="yarnIn" data-i18n="실 이름 (선택)">실 이름 (선택)</label>
+    <input class="input" id="yarnIn" maxlength="100" autocomplete="off">
+    <label class="f" for="colorIn" data-i18n="색상 (선택)">색상 (선택)</label>
+    <input class="input" id="colorIn" maxlength="100" autocomplete="off">
+    <label class="f" for="patternIn" data-i18n="도안 링크 (선택)">도안 링크 (선택)</label>
+    <input class="input" id="patternIn" type="url" inputmode="url" placeholder="https://" autocomplete="url" maxlength="2048">
+    <a class="pattern-link" id="editPatternLink" target="_blank" rel="noopener noreferrer" hidden data-i18n="도안 열기">도안 열기</a>
     <div id="doneAtWrap" hidden>
       <label class="f" for="doneAtIn" data-i18n="완성일">완성일</label>
       <input class="input" id="doneAtIn" type="date">
@@ -265,12 +294,13 @@ textarea.input { min-height: 64px; resize: vertical; }
     </div>
     <div class="photos" id="detailPhotos"></div>
     <div class="facts">
-      <div class="mm-num" id="detailMm"></div>
+      <div><div class="mm-num" id="detailMm"></div><div class="dates" id="detailCraft"></div></div>
       <div>
         <div class="dates" id="detailFacts"></div>
         <div class="note" id="detailNote"></div>
       </div>
     </div>
+    <dl class="project-materials" id="detailMaterials" hidden></dl>
     <div class="actions">
       <button type="button" class="btn primary" id="detailCardBtn" data-i18n="자랑 카드 만들기">자랑 카드 만들기</button>
     </div>
@@ -372,11 +402,12 @@ const MM_PRESETS = [2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0];
 const FULL_MAX = 1600, THUMB_MAX = 480;
 
 /* ---------- storage (IndexedDB) ---------- */
-let db;
+let db, newDatabase = false;
 function openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open("knitlog", 1);
-    req.onupgradeneeded = () => {
+    req.onupgradeneeded = event => {
+      newDatabase = event.oldVersion === 0;
       const d = req.result;
       d.createObjectStore("projects", { keyPath: "id" });
       d.createObjectStore("photos", { keyPath: "id" }).createIndex("projectId", "projectId");
@@ -410,6 +441,10 @@ let galleryMm = null, galleryQuery = "";
 const $ = s => document.querySelector(s);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function safePatternUrl(value) {
+  if (!value) return "";
+  try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol) ? url.href : ""; } catch { return ""; }
+}
 const fmtMm = n => { const s = Number(n).toFixed(2); return s.endsWith("0") ? s.slice(0, -1) : s; };
 const mmHtml = n => n == null ? `<span class="unknown">${t("호수 모름")}</span>` : `${fmtMm(n)}<small>mm</small>`;
 const mmText = n => n == null ? t("호수 모름") : `${fmtMm(n)}mm`;
@@ -462,21 +497,28 @@ function render() {
 }
 
 const ADD_HEAD = label => `<div class="list-head"><span class="count">${label}</span><button class="btn primary" id="addBtn">${t("작품 추가")}</button></div>`;
+const exampleBadge = p => p.example ? `<span class="example-label">${t("예시")}</span>` : "";
+const displayField = (p, field) => p.example && p[field] ? t(p[field]) : (p[field] || "");
+const exampleNotice = () => projects.some(p => p.example)
+  ? `<div class="example-notice"><span>${t("가상의 예시 작품입니다.")}</span><button type="button" id="removeExamplesBtn">${t("예시 지우기")}</button></div>`
+  : `<div class="example-notice"><span>${t("예시 작품을 살펴볼 수 있어요.")}</span><button type="button" id="addExamplesBtn">${t("예시 보기")}</button></div>`;
 
 function renderActive() {
   const list = projects.filter(p => p.status === "active").sort((a, b) => b.updatedAt - a.updatedAt);
   if (!list.length) {
-    $("#activeView").innerHTML = `${ADD_HEAD(t("진행 중인 작품 없음"))}<p class="empty">${t("작품 이름과 코바늘 호수를 기록하세요.")}</p>`;
+    $("#activeView").innerHTML = `${ADD_HEAD(t("진행 중인 작품 없음"))}${exampleNotice()}<p class="empty">${t("작품 이름과 바늘 호수를 기록하세요.")}</p>`;
     return;
   }
-  $("#activeView").innerHTML = ADD_HEAD(t("진행 중 {0}개", list.length)) + `<div class="list">${list.map(p => `
-    <button class="row-item" data-edit="${p.id}">
+  $("#activeView").innerHTML = ADD_HEAD(t("진행 중 {0}개", list.length)) + exampleNotice() + `<div class="list">${list.map(p => `
+    <button class="row-item${p.example && coverOf(p) ? " has-thumb" : ""}" data-edit="${p.id}">
       <div class="mm-num">${mmHtml(p.mm)}</div>
       <div>
-        <div class="name">${esc(p.name)}</div>
+        <div class="name">${esc(displayField(p, "name"))}${exampleBadge(p)}</div>
+        ${p.yarn || p.color ? `<div class="since">${[displayField(p, "yarn"), displayField(p, "color")].filter(Boolean).map(esc).join(" · ")}</div>` : ""}
         ${p.note ? `<div class="note">${esc(p.note)}</div>` : ""}
         <div class="since">${sinceText(p.updatedAt)}</div>
       </div>
+      ${p.example && coverOf(p) ? `<img class="example-thumb" src="${thumbUrl(coverOf(p))}" alt="">` : ""}
     </button>`).join("")}</div>`;
 }
 
@@ -485,7 +527,7 @@ function renderDone() {
   const head = label => `<div class="list-head"><span class="count">${label}</span><div class="head-btns">
     ${done.length ? `<button class="btn" id="yearCardBtn">${t("모아보기 카드")}</button>` : ""}<button class="btn primary" id="bulkBtn">${t("완성작 추가")}</button></div></div>`;
   if (!done.length) {
-    $("#doneView").innerHTML = `${head(t("완성한 작품 없음"))}<p class="empty">${t("진행 중인 작품을 '완성 처리'하거나, 이미 완성한 작품을 사진과 함께 한꺼번에 추가하세요.")}</p>`;
+    $("#doneView").innerHTML = `${head(t("완성한 작품 없음"))}${exampleNotice()}<p class="empty">${t("진행 중인 작품을 '완성 처리'하거나, 이미 완성한 작품을 사진과 함께 한꺼번에 추가하세요.")}</p>`;
     return;
   }
   const mms = [...new Set(done.map(p => p.mm).filter(m => m != null))].sort((a, b) => a - b);
@@ -494,7 +536,7 @@ function renderDone() {
   const q = galleryQuery.trim().toLowerCase();
   const shown = done
     .filter(p => galleryMm === null || (galleryMm === "none" ? p.mm == null : p.mm === galleryMm))
-    .filter(p => !q || p.name.toLowerCase().includes(q) || (p.note || "").toLowerCase().includes(q))
+    .filter(p => !q || [displayField(p, "name"), p.note, displayField(p, "yarn"), displayField(p, "color")].some(value => String(value || "").toLowerCase().includes(q)))
     .sort((a, b) => b.doneAt - a.doneAt);
 
   const groups = [];
@@ -505,9 +547,9 @@ function renderDone() {
     groups[groups.length - 1].items.push(p);
   }
 
-  const toolbar = head(t("완성 {0}개", done.length)) + `
+  const toolbar = head(t("완성 {0}개", done.length)) + exampleNotice() + `
     <div class="toolbar">
-      <input class="search" id="searchIn" type="search" placeholder="${t("작품 이름 검색")}" value="${esc(galleryQuery)}">
+      <input class="search" id="searchIn" type="search" aria-label="${t("작품·실·색상 검색")}" placeholder="${t("작품·실·색상 검색")}" value="${esc(galleryQuery)}">
       <div class="filters">
         <button class="filter" data-mm="" aria-pressed="${galleryMm === null}">${t("전체 {0}", done.length)}</button>
         ${mms.map(m => `<button class="filter" data-mm="${m}" aria-pressed="${galleryMm === m}">${fmtMm(m)}mm</button>`).join("")}
@@ -515,13 +557,13 @@ function renderDone() {
       </div>
     </div>`;
   const body = groups.length ? groups.map(g => `
-    <div class="group-title">${g.key}</div>
+    <div class="group-title">${g.key}<span>${t("완성작 {0}개", g.items.length)}</span></div>
     <div class="grid">${g.items.map(p => {
       const ph = photosOf(p.id), cover = coverOf(p);
       return `<button class="tile" data-detail="${p.id}">
         <div class="ph">${cover ? `<img src="${thumbUrl(cover)}" alt="" loading="lazy">` : t("사진 없음")}
           ${ph.length > 1 ? `<span class="count">${ph.length}</span>` : ""}</div>
-        <div class="name">${esc(p.name)}</div><div class="sub">${mmText(p.mm)} · ${fmtDate(p.doneAt)}</div>
+        <div class="name">${esc(displayField(p, "name"))}${exampleBadge(p)}</div><div class="sub">${mmText(p.mm)} · ${fmtDate(p.doneAt)}</div>
       </button>`;
     }).join("")}</div>`).join("") : `<p class="empty">${t("조건에 맞는 작품이 없습니다.")}</p>`;
 
@@ -540,8 +582,17 @@ function renderMmGrid() {
 function openEdit(p) {
   editing = p || null;
   $("#editTitle").textContent = p ? t("작품 수정") : t("새 작품");
-  $("#nameIn").value = p ? p.name : "";
+  $("#exampleEditHint").hidden = !(p && p.example);
+  $("#nameIn").value = p ? displayField(p, "name") : "";
+  $("#craftIn").value = p && p.craft === "knitting" ? "knitting" : "crochet";
+  updateNeedleLabel();
   $("#noteIn").value = p ? (p.note || "") : "";
+  $("#yarnIn").value = p ? displayField(p, "yarn") : "";
+  $("#colorIn").value = p ? displayField(p, "color") : "";
+  $("#patternIn").value = p ? (p.patternUrl || "") : "";
+  const patternUrl = p && safePatternUrl(p.patternUrl);
+  $("#editPatternLink").hidden = !patternUrl;
+  if (patternUrl) $("#editPatternLink").href = patternUrl;
   selectedMm = p ? p.mm : null;
   $("#mmCustom").value = p && p.mm != null && !MM_PRESETS.includes(p.mm) ? p.mm : "";
   const isDone = !!p && p.status === "done";
@@ -558,24 +609,31 @@ function readMm() {
   const custom = parseMm($("#mmCustom").value);
   return custom === null ? selectedMm : custom;
 }
+function updateNeedleLabel() {
+  $("#needleSizeLabel").textContent = $("#craftIn").value === "knitting" ? t("대바늘 호수") : t("코바늘 호수");
+}
 async function saveEdit() {
   const name = $("#nameIn").value.trim();
   const mm = readMm();
   if (!name) { toast(t("작품 이름을 입력하세요")); $("#nameIn").focus(); return; }
   const isDone = !!editing && editing.status === "done";
-  if (mm === null && !isDone) { toast(t("코바늘 호수를 선택하세요")); return; }
+  if (mm === null && !isDone) { toast($("#craftIn").value === "knitting" ? t("대바늘 호수를 선택하세요") : t("코바늘 호수를 선택하세요")); return; }
   if (isDone && !$("#doneAtIn").value) { toast(t("완성일을 입력하세요")); $("#doneAtIn").focus(); return; }
   if (Number.isNaN(mm)) { toast(t("호수는 숫자로 입력하세요 (예: 3.75)")); $("#mmCustom").focus(); return; }
+  const rawPattern = $("#patternIn").value.trim();
+  const patternUrl = safePatternUrl(rawPattern);
+  if (rawPattern && !patternUrl) { toast(t("도안 링크는 http:// 또는 https://로 시작해야 합니다")); $("#patternIn").focus(); return; }
+  const materials = { craft: $("#craftIn").value === "knitting" ? "knitting" : "crochet", yarn: $("#yarnIn").value.trim(), color: $("#colorIn").value.trim(), patternUrl };
   const now = Date.now();
   const p = editing
-    ? { ...editing, name, mm, note: $("#noteIn").value.trim(), updatedAt: now }
+    ? { ...editing, ...materials, example: false, name, mm, note: $("#noteIn").value.trim(), updatedAt: now }
     : null;
   if (p && isDone) {
     p.doneAt = fromDateInput($("#doneAtIn").value);
     if (p.startUnknown || p.createdAt > p.doneAt) p.createdAt = p.doneAt;
   }
   const saved = p ||
-    { id: uid(), name, mm, note: $("#noteIn").value.trim(), status: "active", createdAt: now, updatedAt: now, doneAt: null };
+    { id: uid(), name, mm, ...materials, note: $("#noteIn").value.trim(), status: "active", createdAt: now, updatedAt: now, doneAt: null };
   await putProject(saved);
   upsertLocal(saved);
   $("#editDlg").close();
@@ -599,6 +657,53 @@ async function deleteProject(p) {
   toast(t("삭제했습니다"));
   render();
   return true;
+}
+
+// Examples live in the same local database so they can be explored normally.
+// They are explicitly marked, and never overwrite existing project IDs.
+async function addExamples() {
+  if (projects.some(p => p.example)) return;
+  busy(true);
+  try {
+    const loadExampleImage = async path => {
+      try {
+        const response = await fetch(path);
+        if (response.ok && response.headers.get("content-type")?.startsWith("image/")) return await response.blob();
+      } catch { /* Examples remain usable without optional illustrations. */ }
+      return null;
+    };
+    const [blueImage, yellowImage] = await Promise.all([loadExampleImage("example-blue.jpg"), loadExampleImage("example-yellow.jpg")]);
+    const now = Date.now(), doneAt = now - 6 * 86400000;
+    const active = { id: uid(), name: "파란 컵받침", craft: "crochet", mm: 4, yarn: "코튼 실", color: "하늘색", note: "", patternUrl: "", example: true, status: "active", createdAt: now, updatedAt: now, doneAt: null };
+    const done = { id: uid(), name: "노란 뜨개 스와치", craft: "knitting", mm: 3.5, yarn: "코튼 실", color: "노란색", note: "", patternUrl: "", example: true, status: "done", createdAt: doneAt, updatedAt: now, doneAt, startUnknown: true };
+    const samplePhotos = [[active, blueImage], [done, yellowImage]].filter(([, blob]) => blob).map(([project, blob]) => {
+      const ph = { id: uid(), projectId: project.id, createdAt: now, thumb: blob, full: blob };
+      project.coverId = ph.id;
+      return ph;
+    });
+    await run(["projects", "photos", "fulls"], "readwrite", tx => {
+      tx.objectStore("projects").add(active); tx.objectStore("projects").add(done);
+      for (const ph of samplePhotos) {
+        tx.objectStore("photos").add({ id: ph.id, projectId: ph.projectId, createdAt: ph.createdAt, thumb: ph.thumb });
+        tx.objectStore("fulls").add({ id: ph.id, full: ph.full });
+      }
+    });
+    await loadAll(); render();
+  } catch { toast(t("예시를 불러오지 못했습니다")); }
+  finally { busy(false); }
+}
+async function removeExamples() {
+  const examples = projects.filter(p => p.example);
+  if (!examples.length || !confirm(t("예시 작품과 여기에 추가한 사진을 모두 지울까요? 내 작품은 지워지지 않습니다."))) return;
+  const ids = new Set(examples.map(p => p.id));
+  const samplePhotos = photos.filter(p => ids.has(p.projectId));
+  try {
+    await run(["projects", "photos", "fulls"], "readwrite", tx => {
+      for (const p of examples) tx.objectStore("projects").delete(p.id);
+      for (const p of samplePhotos) { tx.objectStore("photos").delete(p.id); tx.objectStore("fulls").delete(p.id); }
+    });
+    await loadAll(); render(); toast(t("예시를 지웠습니다"));
+  } catch { toast(t("예시를 지우지 못했습니다")); }
 }
 
 /* ---------- photos ---------- */
@@ -762,7 +867,7 @@ $("#photoInput").addEventListener("change", async e => {
 let finishing = null, finishPending = [];
 function openFinish(p) {
   finishing = p; finishPending = [];
-  $("#finishName").textContent = `${p.name} · ${mmText(p.mm)}`;
+  $("#finishName").textContent = `${displayField(p, "name")} · ${mmText(p.mm)}`;
   $("#finishPhotos").innerHTML = "";
   $("#editDlg").close();
   $("#finishDlg").showModal();
@@ -884,14 +989,20 @@ let detailing = null;
 const fullUrls = [];
 async function openDetail(p) {
   detailing = p;
-  $("#detailName").textContent = p.name;
+  $("#detailName").textContent = p.example ? `${displayField(p, "name")} · ${t("예시")}` : p.name;
   $("#detailMm").innerHTML = mmHtml(p.mm);
+  $("#detailCraft").textContent = p.craft === "knitting" ? t("대바늘") : t("코바늘");
   const days = Math.max(1, Math.round((p.doneAt - p.createdAt) / 86400000));
   $("#detailFacts").textContent = p.startUnknown
     ? t("{0} 완성", fmtDate(p.doneAt))
     : t("{0} 시작 · {1} 완성 · {2}일", fmtDate(p.createdAt), fmtDate(p.doneAt), days);
   $("#detailNote").textContent = p.note || "";
   $("#detailNote").hidden = !p.note;
+  const url = safePatternUrl(p.patternUrl);
+  const materials = [[t("실 이름"), displayField(p, "yarn")], [t("색상"), displayField(p, "color")]].filter(([, value]) => value);
+  $("#detailMaterials").innerHTML = materials.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join("") +
+    (url ? `<div><dt>${t("도안")}</dt><dd><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${t("도안 열기")}</a></dd></div>` : "");
+  $("#detailMaterials").hidden = !materials.length && !url;
   await renderDetailPhotos();
   if (!$("#detailDlg").open) $("#detailDlg").showModal();
 }
@@ -921,12 +1032,12 @@ async function deletePhoto(id) {
 
 /* ---------- share cards (drawn on canvas at 1080px wide) ---------- */
 const CARD_FONT = '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif';
-const C_INK = "#333330", C_MUTED = "#6b6a64", C_LINE = "#d7d6d0", C_SURFACE = "#e9e8e4";
+const C_INK = "#333330", C_MUTED = "#69645b", C_LINE = "#d8d2c7", C_SURFACE = "#e9e5dd";
 function cardCanvas(w, h) {
   const c = document.createElement("canvas");
   c.width = w; c.height = h;
   const ctx = c.getContext("2d");
-  ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = "#f8f6f1"; ctx.fillRect(0, 0, w, h);
   return [c, ctx];
 }
 const cardFont = (ctx, size, weight = 400) => { ctx.font = `${weight} ${size}px ${CARD_FONT}`; };
@@ -973,22 +1084,27 @@ const coverThumbs = list => Promise.all(list.map(p => { const c = coverOf(p); re
 
 async function drawWorkCard(p) {
   const [c, ctx] = cardCanvas(1080, 1920);
-  drawCover(ctx, await coverFull(p), 80, 96, 920, 1180);
+  cardText(ctx, p.example ? t("예시 작품") : t("뜨개 기록"), 80, 92, 27, { color: C_MUTED });
+  cardText(ctx, String(new Date(p.doneAt).getFullYear()), 1000, 92, 27, { color: C_MUTED, align: "right" });
+  drawCover(ctx, await coverFull(p), 80, 130, 920, 1060);
   cardFont(ctx, 64, 500);
-  let y = 1388;
-  for (const line of wrapLines(ctx, p.name, 920, 2)) { cardText(ctx, line, 80, y, 64, { weight: 500 }); y += 78; }
-  y += -78 + 46;
+  let y = 1290;
+  for (const line of wrapLines(ctx, displayField(p, "name"), 920, 2)) { cardText(ctx, line, 80, y, 64, { weight: 500 }); y += 78; }
+  y += 8;
   cardRule(ctx, 80, y, 1000);
-  const rows = [[t("코바늘"), mmText(p.mm)], [t("완성"), fmtDate(p.doneAt)]];
+  const rows = [[p.craft === "knitting" ? t("대바늘") : t("코바늘"), mmText(p.mm)], [t("완성"), fmtDate(p.doneAt)]];
+  if (p.yarn || p.color) rows.push([t("실 이름"), [displayField(p, "yarn"), displayField(p, "color")].filter(Boolean).join(" · ")]);
   if (!p.startUnknown) rows.push([t("걸린 기간"), t("{0}일", Math.max(1, Math.round((p.doneAt - p.createdAt) / 86400000)))]);
   for (const [label, value] of rows) {
-    cardText(ctx, label, 80, y + 54, 26, { color: C_MUTED });
-    cardText(ctx, value, 1000, y + 57, 38, { color: label === t("코바늘") && p.mm == null ? C_MUTED : C_INK, align: "right" });
-    y += 86;
+    cardText(ctx, label, 80, y + 48, 25, { color: C_MUTED });
+    cardFont(ctx, 32, 400);
+    const line = wrapLines(ctx, String(value), 650, 1)[0] || "";
+    cardText(ctx, line, 1000, y + 49, 32, { align: "right" });
+    y += 70;
     cardRule(ctx, 80, y, 1000);
   }
-  cardText(ctx, t("{0}년 완성작", new Date(p.doneAt).getFullYear()), 80, 1840, 22, { color: C_MUTED });
-  cardText(ctx, t("뜨개 기록"), 1000, 1840, 22, { color: C_MUTED, align: "right" });
+  cardText(ctx, t("{0}년 완성작", new Date(p.doneAt).getFullYear()), 80, 1840, 24, { color: C_MUTED });
+  cardText(ctx, t("뜨개 기록"), 1000, 1840, 24, { color: C_MUTED, align: "right" });
   return c;
 }
 const yearWorks = year => projects
@@ -998,8 +1114,8 @@ const byMonth = list => Array.from({ length: 12 }, (_, m) => list.filter(p => ne
 // Returns the y of the rule under the header.
 function drawYearHead(ctx, x, top, year, sub) {
   cardText(ctx, t("뜨개 기록"), x, top + 24, 24, { color: C_MUTED });
-  cardText(ctx, String(year), x - 4, top + 132, 112, { weight: 500 });
-  cardText(ctx, sub, x, top + 188, 30);
+  ctx.font = '400 112px Georgia, serif'; ctx.fillStyle = C_INK; ctx.textAlign = "left"; ctx.fillText(String(year), x - 4, top + 132);
+  cardText(ctx, sub, x, top + 188, 27);
   return top + 224;
 }
 async function drawBarsCard(year) {
@@ -1009,18 +1125,18 @@ async function drawBarsCard(year) {
   cardRule(ctx, 80, y, 1000);
   const shown = months.flatMap(l => l.slice(0, 8));
   const imgs = new Map((await coverThumbs(shown)).map((img, i) => [shown[i].id, img]));
-  const ROW = 112, T = 80;
+  const ROW = 112, T = 76;
   months.forEach((l, m) => {
     const mid = y + ROW / 2;
     cardText(ctx, new Date(2000,m,1).toLocaleDateString(locale(),{month:'short'}), 80, mid + 10, 28);
     cardText(ctx, String(l.length), 222, mid + 10, 28, { color: C_MUTED, align: "right" });
-    l.slice(0, 8).forEach((p, i) => drawCover(ctx, imgs.get(p.id), 258 + i * (T + 4), mid - T / 2, T, T));
-    if (l.length > 8) cardText(ctx, `+${l.length - 8}`, 258 + 8 * (T + 4) + 6, mid + 8, 22, { color: C_MUTED });
+    l.slice(0, 8).forEach((p, i) => drawCover(ctx, imgs.get(p.id), 258 + i * (T + 8), mid - T / 2, T, T));
+    if (l.length > 8) cardText(ctx, `+${l.length - 8}`, 258 + 8 * (T + 8) + 6, mid + 8, 22, { color: C_MUTED });
     y += ROW;
     cardRule(ctx, 80, y, 1000);
   });
   cardText(ctx, t("월별 완성작"), 80, 1840, 22, { color: C_MUTED });
-  cardText(ctx, t("뜨개 기록"), 1000, 1840, 22, { color: C_MUTED, align: "right" });
+  cardText(ctx, list.some(p => p.example) ? t("예시 작품 포함") : t("뜨개 기록"), 1000, 1840, 22, { color: C_MUTED, align: "right" });
   return c;
 }
 async function drawMosaicCard(year) {
@@ -1031,12 +1147,13 @@ async function drawMosaicCard(year) {
   cardRule(ctx, 64, y, 1016);
   y += 28;
   // Fewest columns whose square tiles still fit the space under the header.
-  const W = 952, H = 1350 - 64 - y, GAP = 4;
-  let cols = 4;
-  while (Math.ceil(list.length / cols) * (W / cols) > H) cols++;
+  const W = 952, H = 1350 - 96 - y, GAP = 10;
+  let cols = list.length <= 1 ? 1 : list.length <= 4 ? 2 : 3;
+  while (Math.ceil(list.length / cols) * ((W - GAP * (cols - 1)) / cols + GAP) - GAP > H) cols++;
   const size = (W - GAP * (cols - 1)) / cols;
   const imgs = await coverThumbs(list);
   list.forEach((p, i) => drawCover(ctx, imgs[i], 64 + (i % cols) * (size + GAP), y + Math.floor(i / cols) * (size + GAP), size, size));
+  cardText(ctx, list.some(p => p.example) ? t("예시 작품 포함") : t("뜨개 기록"), 1016, 1310, 23, { color: C_MUTED, align: "right" });
   return c;
 }
 
@@ -1094,12 +1211,14 @@ async function exportBackup() {
   try {
     const fulls = await getAll("fulls");
     const fullMap = new Map(fulls.map(f => [f.id, f.full]));
+    const backedUpProjects = projects.filter(p => !p.example);
+    const backedUpIds = new Set(backedUpProjects.map(p => p.id));
     const outPhotos = [];
-    for (const p of photos) {
+    for (const p of photos.filter(p => backedUpIds.has(p.projectId))) {
       outPhotos.push({ id: p.id, projectId: p.projectId, createdAt: p.createdAt,
         thumb: await blobToDataUrl(p.thumb), full: fullMap.has(p.id) ? await blobToDataUrl(fullMap.get(p.id)) : null });
     }
-    const data = { app: "knit-log", version: 1, exportedAt: new Date().toISOString(), projects, photos: outPhotos };
+    const data = { app: "knit-log", version: 1, exportedAt: new Date().toISOString(), projects: backedUpProjects, photos: outPhotos };
     const d = new Date();
     const name = `knit-log-backup-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}.json`;
     const file = new File([JSON.stringify(data)], name, { type: "application/json" });
@@ -1167,6 +1286,8 @@ document.addEventListener("click", e => {
   if (button.dataset.merge) { mergeBulkRow(Number(button.dataset.merge)); return; }
   if (button.dataset.remove) { bulkRows.splice(Number(button.dataset.remove), 1); renderBulk(); return; }
   if (button.id === "bulkBtn") { openBulk(); return; }
+  if (button.id === "addExamplesBtn") { addExamples(); return; }
+  if (button.id === "removeExamplesBtn") { removeExamples(); return; }
   if (button.dataset.delphoto) { deletePhoto(button.dataset.delphoto); return; }
   if (button.dataset.cover) { setCover(button.dataset.cover); return; }
   if (button.dataset.rotate) { rotatePhoto(button.dataset.rotate); return; }
@@ -1191,6 +1312,7 @@ document.addEventListener("click", e => {
 $("#tabActive").onclick = () => { tab = "active"; render(); };
 $("#tabDone").onclick = () => { tab = "done"; render(); };
 $("#saveBtn").onclick = saveEdit;
+$("#craftIn").addEventListener("change", updateNeedleLabel);
 $("#nameIn").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); saveEdit(); } });
 $("#mmCustom").addEventListener("input", () => { if ($("#mmCustom").value.trim()) { selectedMm = null; renderMmGrid(); } });
 $("#finishBtn").onclick = () => openFinish(editing);
@@ -1226,8 +1348,9 @@ $("#bulkSaveBtn").onclick = saveBulk;
 $("#bulkDlg").addEventListener("cancel", e => { e.preventDefault(); closeBulk(); });
 $("#detailDeleteBtn").onclick = async () => { if (await deleteProject(detailing)) $("#detailDlg").close(); };
 $("#settingsBtn").onclick = () => {
-  const done = projects.filter(p => p.status === "done").length;
-  $("#backupInfo").textContent = t("진행 중 {0}개 · 완성 {1}개 · 사진 {2}장", projects.length - done, done, photos.length);
+  const real = projects.filter(p => !p.example), ids = new Set(real.map(p => p.id));
+  const done = real.filter(p => p.status === "done").length;
+  $("#backupInfo").textContent = t("진행 중 {0}개 · 완성 {1}개 · 사진 {2}장", real.length - done, done, photos.filter(p => ids.has(p.projectId)).length);
   $("#backupDlg").showModal();
 };
 $("#exportBtn").onclick = exportBackup;
@@ -1255,6 +1378,7 @@ async function loadAll() {
 (async () => {
   db = await openDB();
   await loadAll();
+  if (newDatabase) await addExamples();
   render();
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});

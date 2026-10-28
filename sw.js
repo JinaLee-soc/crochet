@@ -1,6 +1,6 @@
 // Bump CACHE when shipping changes so phones pick up the new version.
-const CACHE = "knit-log-v8";
-const SHELL = ["./", "index.html", "manifest.webmanifest", "manifest.en.webmanifest", "i18n.js", "icon-180.png", "icon-192.png", "icon-512.png"];
+const CACHE = "knit-log-v10";
+const SHELL = ["./", "index.html", "manifest.webmanifest", "manifest.en.webmanifest", "i18n.js", "icon-180.png", "icon-192.png", "icon-512.png", "example-blue.jpg", "example-yellow.jpg"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

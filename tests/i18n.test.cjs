@@ -36,3 +36,46 @@ const eventContext={document:{addEventListener:(type,fn)=>{clickHandler=fn;}},
 vm.runInNewContext(wiring,eventContext);
 clickHandler({target:{closest:()=>({id:'detailAddPhoto',dataset:{},hasAttribute:()=>false})}});
 photoTask.then(()=>{assert.equal(message,'Photos added.');console.log('PASS: translated photo-add notification');}).catch(error=>{console.error(error);process.exitCode=1;});
+
+// Exercise the real save path with an old project and optional material fields.
+const saveCode = inline.slice(inline.indexOf('async function saveEdit()'), inline.indexOf('function upsertLocal'));
+const urlCode = inline.slice(inline.indexOf('function safePatternUrl('), inline.indexOf('const fmtMm'));
+const fields = {
+  '#nameIn': {value:'Test bag', focus(){}}, '#noteIn': {value:'original note'},
+  '#craftIn': {value:'crochet'}, '#yarnIn': {value:' Cotton '}, '#colorIn': {value:' Blue '},
+  '#patternIn': {value:'https://example.com/pattern', focus(){}},
+  '#editDlg': {close(){}}, '#doneAtIn': {value:'2026-01-01'}, '#mmCustom': {focus(){}}
+};
+let saved, warning;
+const saveContext = {URL, Date, Number, $, editing:{id:'old',status:'active',createdAt:1,custom:'keep'},
+  readMm:()=>4, putProject:async p=>{saved=p;}, upsertLocal:()=>{}, render:()=>{},
+  toast:msg=>{warning=msg;}, t:(key,...args)=>api.t(key,...args), mmText:String};
+function $(key){return fields[key];}
+vm.runInNewContext(`${urlCode}\n${saveCode}\nthis.saveEdit = saveEdit;`,saveContext);
+(async()=>{
+  await saveContext.saveEdit();
+  assert.equal(saved.craft,'crochet');
+  assert.equal(saved.yarn,'Cotton'); assert.equal(saved.color,'Blue');
+  assert.equal(saved.patternUrl,'https://example.com/pattern');
+  assert.equal(saved.custom,'keep'); assert.equal(saved.id,'old');
+  const restored=JSON.parse(JSON.stringify({app:'knit-log',version:1,projects:[saved]}));
+  assert.equal(restored.projects[0].yarn,'Cotton'); assert.equal(restored.projects[0].patternUrl,saved.patternUrl);
+  fields['#craftIn'].value='knitting'; await saveContext.saveEdit();
+  assert.equal(saved.craft,'knitting');
+  saved=undefined; fields['#patternIn'].value='javascript:alert(1)'; await saveContext.saveEdit();
+  assert.equal(saved,undefined); assert.match(warning,/http/);
+  console.log('PASS: existing project fields preserved, materials saved and serialized, unsafe link rejected');
+})().catch(error=>{console.error(error);process.exitCode=1;});
+
+// Removing examples must leave ordinary projects and their photos alone.
+const removeCode=inline.slice(inline.indexOf('async function removeExamples()'),inline.indexOf('/* ---------- photos ---------- */'));
+const deleted={projects:[],photos:[],fulls:[]};
+const removalContext={projects:[{id:'sample',example:true},{id:'real'}],
+  photos:[{id:'sample-photo',projectId:'sample'},{id:'real-photo',projectId:'real'}],
+  Set,confirm:()=>true,t:key=>key,toast:()=>{},loadAll:async()=>{},render:()=>{},
+  run:async(_stores,_mode,fn)=>fn({objectStore:name=>({delete:id=>deleted[name].push(id)})})};
+vm.runInNewContext(`${removeCode}\nthis.removeExamples=removeExamples;`,removalContext);
+removalContext.removeExamples().then(()=>{
+  assert.deepEqual(deleted,{projects:['sample'],photos:['sample-photo'],fulls:['sample-photo']});
+  console.log('PASS: removing examples preserves real projects and photos');
+}).catch(error=>{console.error(error);process.exitCode=1;});

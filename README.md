@@ -2,7 +2,11 @@
 
 [한국어](README.ko.md) · [Open the app](https://jinalee-soc.github.io/crochet/)
 
-Track crochet projects, hook sizes and notes. Keep photos of finished work and create project cards or a year-in-review image.
+Track crochet and knitting projects, needle sizes and notes. Keep photos of finished work and create project cards or a year-in-review image. Existing projects and bulk-added finished projects default to crochet; change the type in the project editor.
+
+Optionally record the yarn name, color, and pattern link for each project. Search finished projects by name, yarn, or color. Project cards include yarn and color when supplied; pattern links are not included in shared images.
+
+New installations start with two fictional examples and cartoon illustrations. Use **Remove examples** to delete them or **Show examples** to add them again. Examples are not automatically added to existing databases. Saving an edited example turns it into your own project. Projects still marked as examples are not included in backups.
 
 ## Your records stay on your device
 
